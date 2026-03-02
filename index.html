@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Food Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=Outfit:wght@300;600;700&family=Lora:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #1D1C19;  /* dragonBlack2 */
+    --surface:   #282727;  /* dragonBlack4 */
+    --surface2:  #393836;  /* dragonBlack5 */
+    --border:    #393836;  /* dragonBlack5 */
+    --text:      #c5c9c5;  /* dragonWhite  */
+    --muted:     #7a8382;  /* dragonGray3  */
+    --accent:    #8ea4a2;  /* dragonAqua   — calories */
+    --accent2:   #8ba4b0;  /* dragonBlue2  — protein  */
+    --header-fg: #8992a7;  /* dragonViolet */
+    --tab-act:   #c4b28a;  /* dragonYellow */
+    --streak:    #87a987;  /* dragonGreen  */
+    --chip-hov:  #87a987;  /* dragonGreen  */
+    --danger:    #c4746e;  /* dragonRed    */
+    --edit-col:  #b6927b;  /* dragonOrange */
+    --btn-fg:    #12120f;  /* dragonBlack1 */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 120px;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 22px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--bg); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+  header h1 {
+    font-family: 'Lora', serif;
+    font-size: 24px; font-weight: 600; letter-spacing: 0.5px;
+    color: var(--header-fg); line-height: 1;
+  }
+  .date {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 2px; margin-top: 3px;
+  }
+
+  /* ── Streak ── */
+  .streak-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .streak-top   { display: flex; align-items: center; gap: 5px; }
+  .streak-num   { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 600; color: var(--streak); line-height: 1; }
+  .streak-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 74px; z-index: 99;
+  }
+  .tab {
+    flex: 1; padding: 11px 0; text-align: center;
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s;
+  }
+  .tab.active { color: var(--tab-act); border-bottom-color: var(--tab-act); }
+
+  /* ── Stats ── */
+  .summary { padding: 20px 20px 0; }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; text-align: center;
+  }
+  .stat-card .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+  .stat-card .value { font-family: 'Outfit', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.1; margin-top: 4px; }
+  .stat-card .unit  { font-size: 12px; color: var(--muted); }
+  .stat-card.cal .value { color: var(--accent); }
+  .stat-card.pro .value { color: var(--accent2); }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 6px;
+  }
+  .progress-header {
+    display: flex; justify-content: space-between;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .bar-track {
+    height: 5px; background: var(--border); border-radius: 99px;
+    overflow: hidden; margin-bottom: 10px;
+  }
+  .bar-track:last-child { margin-bottom: 0; }
+  .bar-fill { height: 100%; border-radius: 99px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+  .bar-fill.cal { background: var(--accent); }
+  .bar-fill.pro { background: var(--accent2); }
+
+  /* ── Section label ── */
+  .section-label {
+    padding: 18px 20px 7px; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ── Entries ── */
+  .entries { padding: 0 20px; }
+  .entry {
+    display: flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 12px; margin-bottom: 8px; gap: 10px;
+    animation: slideIn .2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity:0; transform:translateY(-5px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .entry-name  { flex:1; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .entry-time  { font-size:10px; color:var(--muted); margin-top:2px; }
+  .entry-info  { text-align:right; flex-shrink:0; }
+  .entry-cal   { font-size:13px; color:var(--accent); font-weight:500; }
+  .entry-pro   { font-size:11px; color:var(--accent2); }
+  .entry-actions { display:flex; gap:2px; flex-shrink:0; }
+  .icon-btn {
+    background:none; border:none; cursor:pointer;
+    font-size:15px; padding:4px; line-height:1;
+    transition:color .15s; color:var(--muted);
+  }
+  .icon-btn.edit:hover { color:var(--edit-col); }
+  .icon-btn.del:hover  { color:var(--danger); }
+  .icon-btn:disabled   { opacity:.25; cursor:default; }
+
+  .empty { text-align:center; color:var(--muted); font-size:12px; padding:40px 20px; letter-spacing:1px; }
+
+  /* ── FAB ── */
+  .fab {
+    position:fixed; bottom:28px; right:20px;
+    width:54px; height:54px;
+    background:var(--header-fg); color:var(--btn-fg);
+    border:none; border-radius:50%; font-size:26px; cursor:pointer;
+    box-shadow:0 4px 20px rgba(137,146,167,.3);
+    transition:transform .15s; z-index:200;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fab:active { transform:scale(.93); }
+  .fab-history {
+    position:fixed; bottom:28px; left:20px;
+    width:54px; height:54px;
+    background:var(--surface2); color:var(--text);
+    border:1px solid var(--border); border-radius:50%; cursor:pointer;
+    box-shadow:0 4px 16px rgba(0,0,0,.3);
+    transition:transform .15s, background .15s; z-index:200;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fab-history:active { transform:scale(.93); }
+  .fab-history.active { background:var(--accent); color:var(--btn-fg); border-color:var(--accent); }
+
+  /* ── Modals ── */
+  .modal-bg {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.8); z-index:300; align-items:flex-end;
+  }
+  .modal-bg.open { display:flex; }
+  .modal {
+    background:var(--surface); border-top:1px solid var(--border);
+    border-radius:20px 20px 0 0; padding:22px 20px 40px; width:100%;
+    max-height:90vh; overflow-y:auto; animation:slideUp .25s ease;
+  }
+  @keyframes slideUp {
+    from { transform:translateY(100%); }
+    to   { transform:translateY(0); }
+  }
+  .modal h2 { font-family:'Syne',sans-serif; font-size:19px; font-weight:800; margin-bottom:18px; }
+
+  /* ── Saved chips ── */
+  .saved-mgmt { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .saved-list {
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin-bottom:14px; max-height:110px; overflow-y:auto;
+  }
+  .saved-chip {
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:99px; padding:5px 12px; font-size:11px;
+    cursor:pointer; transition:all .15s; white-space:nowrap;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .saved-chip.normal:hover { border-color:var(--chip-hov); color:var(--chip-hov); }
+  .chip-edit-btn, .chip-del-btn {
+    background:none; border:none; cursor:pointer;
+    font-size:13px; padding:0; line-height:1; transition:color .15s;
+  }
+  .chip-edit-btn { color:var(--edit-col); }
+  .chip-del-btn  { color:var(--danger); }
+
+  .divider {
+    text-align:center; font-size:10px; color:var(--muted);
+    letter-spacing:2px; margin:10px 0; text-transform:uppercase;
+  }
+
+  /* ── Form elements ── */
+  .form-row      { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+  .form-row.full { grid-template-columns:1fr; }
+  label { display:block; font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:5px; }
+  input[type=text], input[type=number] {
+    width:100%; background:#12120f; border:1px solid var(--border);
+    border-radius:8px; padding:11px 12px; color:var(--text);
+    font-family:'DM Mono',monospace; font-size:14px; outline:none; transition:border-color .15s;
+  }
+  input[type=text]:focus, input[type=number]:focus { border-color:var(--accent); }
+  .checkbox-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .checkbox-row input[type=checkbox] { width:15px; flex-shrink:0; accent-color:var(--accent); }
+  .checkbox-row label { font-size:11px; margin:0; text-transform:none; letter-spacing:0; cursor:pointer; }
+
+  .form-actions { display:flex; gap:14px; margin-top:18px; }
+  .btn {
+    flex:1; padding:17px; border-radius:12px; border:none;
+    font-family:'DM Mono',monospace; font-size:15px; font-weight:500;
+    cursor:pointer; letter-spacing:.5px; transition:opacity .15s;
+  }
+  .btn:active { opacity:.8; }
+  .btn-primary   { background:var(--header-fg); color:var(--btn-fg); }
+  .btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+  .btn-danger    { background:var(--danger); color:var(--btn-fg); }
+
+  .toggle-saved {
+    font-size:11px; color:var(--accent); background:none; border:none;
+    cursor:pointer; font-family:'DM Mono',monospace;
+    letter-spacing:1px; text-decoration:underline; padding:0;
+  }
+
+  /* ── Goals ── */
+  .goals-section { padding:0 20px; margin-top:4px; }
+  .goals-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:16px;
+  }
+  .goals-card h3 {
+    font-family:'Syne',sans-serif; font-size:13px; margin-bottom:12px;
+    color:var(--muted); text-transform:uppercase; letter-spacing:1px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Food Journal</h1>
+    <div class="date" id="headerDate"></div>
+  </div>
+  <div class="streak-badge">
+    <div class="streak-top">
+      <span style="font-size:18px">🔥</span>
+      <span class="streak-num" id="streakNum">0</span>
+    </div>
+    <div class="streak-label">day streak</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="day">Today</div>
+  <div class="tab" data-tab="week">Week</div>
+  <div class="tab" data-tab="month">Month</div>
+</div>
+
+<div id="app">
+  <div class="summary">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div class="stat-card cal">
+        <div class="label">Calories</div>
+        <div class="value" id="calVal">0</div>
+        <div class="unit">kcal</div>
+      </div>
+      <div class="stat-card pro">
+        <div class="label">Protein</div>
+        <div class="value" id="proVal">0</div>
+        <div class="unit">g</div>
+      </div>
+      <div class="stat-card" id="calRemCard" style="border:1px solid var(--border);">
+        <div class="label">Left</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:34px;font-weight:700;line-height:1.1;margin-top:4px;" id="calRemVal">2000</div>
+        <div class="unit">kcal</div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-header"><span>Calories</span><span id="calGoalLabel">/ 2000 kcal</span></div>
+      <div class="bar-track"><div class="bar-fill cal" id="calBar" style="width:0%"></div></div>
+      <div class="progress-header"><span>Protein</span><span id="proGoalLabel">/ 150g</span></div>
+      <div class="bar-track"><div class="bar-fill pro" id="proBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label" id="sectionLabel">Today's Log</div>
+  <div class="entries" id="entries"></div>
+
+  <div class="section-label">Goals</div>
+  <div class="goals-section">
+    <div class="goals-card">
+      <h3>Daily Goals</h3>
+      <div class="form-row">
+        <div><label>Calorie Goal</label><input type="number" id="goalCal" placeholder="2000"></div>
+        <div><label>Protein Goal (g)</label><input type="number" id="goalPro" placeholder="150"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="saveGoals()">Save Goals</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY PANEL ══ -->
+<div id="historyPanel" style="display:none;padding:0 20px;">
+  <div style="padding:18px 0 10px;display:flex;align-items:center;gap:10px;">
+    <button class="icon-btn" onclick="historyShift(-1)" style="font-size:20px;color:var(--text);">‹</button>
+    <div id="historyDateLabel" style="flex:1;text-align:center;font-size:13px;letter-spacing:1px;"></div>
+    <button class="icon-btn" onclick="historyShift(1)" style="font-size:20px;color:var(--text);" id="historyNextBtn">›</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+    <div class="stat-card cal">
+      <div class="label">Calories</div>
+      <div class="value" id="hCalVal">0</div>
+      <div class="unit">kcal</div>
+    </div>
+    <div class="stat-card pro">
+      <div class="label">Protein</div>
+      <div class="value" id="hProVal">0</div>
+      <div class="unit">g</div>
+    </div>
+  </div>
+  <div class="entries" id="historyEntries"></div>
+</div>
+
+<button class="fab" onclick="openAddModal()">+</button>
+<button class="fab-history" id="historyFab" onclick="toggleHistory()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="3" y1="6"  x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+
+<!-- ══ LOG / EDIT ENTRY MODAL ══ -->
+<div class="modal-bg" id="logModalBg" onclick="closeModalOutside(event,'logModalBg')">
+  <div class="modal">
+    <h2 id="logModalTitle">Log Food</h2>
+
+    <div id="savedListWrap">
+      <div class="saved-mgmt">
+        <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Quick-Add</span>
+        <button class="toggle-saved" id="manageSavedBtn" onclick="toggleSavedEdit()">manage</button>
+        <button class="toggle-saved" id="newSavedBtn" style="display:none;color:var(--streak)" onclick="openNewSavedModal()">+ new item</button>
+      </div>
+      <div class="saved-list" id="savedList"></div>
+    </div>
+    <div class="divider" id="logDivider">— or enter manually —</div>
+
+    <div class="form-row full">
+      <div><label>Food Name</label><input type="text" id="inputName" placeholder="e.g. Chicken breast"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Calories (kcal)</label><input type="number" id="inputCal" placeholder="300"></div>
+      <div><label>Protein (g)</label><input type="number" id="inputPro" placeholder="25"></div>
+    </div>
+    <div class="checkbox-row" id="saveNewRow">
+      <input type="checkbox" id="saveItem">
+      <label for="saveItem">Save as quick-add item</label>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeLogModal()">Cancel</button>
+      <button class="btn btn-primary" id="logSubmitBtn" onclick="submitLogForm()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DELETE MODAL ══ -->
+<div class="modal-bg" id="confirmDeleteBg" onclick="closeModalOutside(event,'confirmDeleteBg')">
+  <div class="modal" style="text-align:center;">
+    <h2 style="color:var(--danger);margin-bottom:10px;">Delete?</h2>
+    <p id="confirmDeleteMsg" style="font-size:13px;color:var(--muted);margin-bottom:4px;"></p>
+    <div class="form-actions" style="margin-top:20px;">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDeleteAction()">Delete</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="editSavedBg" onclick="closeModalOutside(event,'editSavedBg')">
+  <div class="modal">
+    <h2 id="editSavedTitle" style="color:var(--edit-col)">Edit Saved Item</h2>
+    <div class="form-row full">
+      <div><label>Food Name</label><input type="text" id="editSavedName" placeholder="Name"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Calories (kcal)</label><input type="number" id="editSavedCal" placeholder="0"></div>
+      <div><label>Protein (g)</label><input type="number" id="editSavedPro" placeholder="0"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeEditSavedModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditedSaved()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Storage ─────────────────────────────────────────
+const DB = {
+  get entries(){ try{return JSON.parse(localStorage.getItem('fl_entries')||'[]')}catch{return[]} },
+  set entries(v){ localStorage.setItem('fl_entries',JSON.stringify(v)) },
+  get saved()  { try{return JSON.parse(localStorage.getItem('fl_saved')||'[]')}catch{return[]} },
+  set saved(v) { localStorage.setItem('fl_saved',JSON.stringify(v)) },
+  get goals()  { try{return JSON.parse(localStorage.getItem('fl_goals')||'{"cal":2000,"pro":150}')}catch{return{cal:2000,pro:150}} },
+  set goals(v) { localStorage.setItem('fl_goals',JSON.stringify(v)) },
+};
+
+// ── State ────────────────────────────────────────────
+let currentTab     = 'day';
+let editingSaved   = false;
+let editingLogTs   = null;  // ts of log entry being edited; null = new
+let editingSavedIdx = null; // index of saved item being edited
+
+// ── Helpers ──────────────────────────────────────────
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone; // device local timezone
+const todayStr = () => new Date().toLocaleDateString('en-CA', {timeZone: TZ});
+const localDateStr = (d) => d.toLocaleDateString('en-CA', {timeZone: TZ});
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtTime = ts => new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+function getDateRange(tab){
+  const now = new Date();
+  if(tab==='day'){ const s=todayStr(); return{start:s,end:s}; }
+  if(tab==='week'){
+    const d=new Date(now);
+    // getDay(): 0=Sun,1=Mon...6=Sat — shift so week starts Monday
+    const dayOfWeek = d.getDay();
+    const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
+    d.setDate(d.getDate() + diffToMon);
+    const start=localDateStr(d);
+    const e=new Date(d); e.setDate(e.getDate()+6);
+    return{start,end:localDateStr(e)};
+  }
+  const start=localDateStr(new Date(now.getFullYear(),now.getMonth(),1));
+  const end  =localDateStr(new Date(now.getFullYear(),now.getMonth()+1,0));
+  return{start,end};
+}
+
+// ── Streak ───────────────────────────────────────────
+function calcStreak(){
+  const days=[...new Set(DB.entries.map(e=>e.date))].sort().reverse();
+  if(!days.length) return 0;
+  let streak=0, cursor=new Date();
+  for(const day of days){
+    const cur=localDateStr(cursor);
+    if(day===cur){ streak++; cursor.setDate(cursor.getDate()-1); }
+    else if(streak===0){
+      // today not yet logged — start counting from yesterday
+      cursor.setDate(cursor.getDate()-1);
+      if(day===localDateStr(cursor)){ streak++; cursor.setDate(cursor.getDate()-1); }
+      else break;
+    } else break;
+  }
+  return streak;
+}
+
+// ── Render ───────────────────────────────────────────
+function render(){
+  const goals=DB.goals;
+  document.getElementById('goalCal').value=goals.cal;
+  document.getElementById('goalPro').value=goals.pro;
+  document.getElementById('streakNum').textContent=calcStreak();
+
+  const {start,end}=getDateRange(currentTab);
+  const entries=DB.entries.filter(e=>e.date>=start&&e.date<=end);
+  const totalCal=entries.reduce((s,e)=>s+(e.cal||0),0);
+  const totalPro=entries.reduce((s,e)=>s+(e.pro||0),0);
+  const mult=currentTab==='week'?7:currentTab==='month'?30:1;
+  const goalCal=goals.cal*mult, goalPro=goals.pro*mult;
+
+  document.getElementById('calVal').textContent=totalCal;
+  document.getElementById('proVal').textContent=totalPro;
+  document.getElementById('calBar').style.width=Math.min(100,(totalCal/goalCal)*100)+'%';
+  document.getElementById('proBar').style.width=Math.min(100,(totalPro/goalPro)*100)+'%';
+  document.getElementById('calGoalLabel').textContent=`/ ${goalCal} kcal`;
+  document.getElementById('proGoalLabel').textContent=`/ ${goalPro}g`;
+
+  // Calories remaining (only meaningful for day view)
+  const remCard = document.getElementById('calRemCard');
+  const remVal  = document.getElementById('calRemVal');
+  if(currentTab !== 'none'){
+    remCard.style.display = '';
+    const rem = (currentTab === 'day' ? goals.cal : goalCal) - totalCal;
+    remVal.textContent = rem;
+    if(rem >= 0){
+      remVal.style.color = rem < goalCal * 0.15 ? 'var(--tab-act)' : 'var(--text)';
+      remCard.querySelector('.unit').textContent = 'kcal left';
+      remCard.style.borderColor = 'var(--border)';
+    } else {
+      remVal.style.color = 'var(--danger)';
+      remCard.querySelector('.unit').textContent = 'kcal over';
+      remCard.style.borderColor = 'var(--danger)';
+    }
+  }
+
+  const labels={day:"Today's Log",week:"This Week's Log",month:"This Month's Log"};
+  document.getElementById('sectionLabel').textContent=labels[currentTab];
+
+  const el=document.getElementById('entries');
+  if(!entries.length){ el.innerHTML='<div class="empty">NO ENTRIES YET</div>'; return; }
+  el.innerHTML=[...entries].sort((a,b)=>b.ts-a.ts).map(e=>`
+    <div class="entry">
+      <div style="flex:1;min-width:0;">
+        <div class="entry-name">${esc(e.name)}</div>
+        <div class="entry-time">${fmtTime(e.ts)} · ${e.date}</div>
+      </div>
+      <div class="entry-info">
+        <div class="entry-cal">${e.cal} kcal</div>
+        <div class="entry-pro">${e.pro}g</div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn edit" title="Edit"   onclick="openEditLogModal(${e.ts})">✎</button>
+        <button class="icon-btn del"  title="Delete" onclick="deleteEntry(${e.ts})">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Log Entry CRUD ────────────────────────────────────
+function deleteEntry(ts){
+  const e=DB.entries.find(e=>e.ts===ts);
+  showConfirm('Remove "'+(e?e.name:'this entry')+'"?', ()=>{
+    DB.entries=DB.entries.filter(e=>e.ts!==ts);
+    render();
+  });
+}
+
+function openAddModal(){
+  editingLogTs=null;
+  document.getElementById('logModalTitle').textContent='Log Food';
+  document.getElementById('logSubmitBtn').textContent='Add';
+  document.getElementById('inputName').value='';
+  document.getElementById('inputCal').value='';
+  document.getElementById('inputPro').value='';
+  document.getElementById('saveItem').checked=false;
+  document.getElementById('savedListWrap').style.display='';
+  document.getElementById('logDivider').style.display='';
+  document.getElementById('saveNewRow').style.display='';
+  editingSaved=false;
+  renderSavedChips();
+  openModal('logModalBg');
+  setTimeout(()=>document.getElementById('inputName').focus(),120);
+}
+
+function openEditLogModal(ts){
+  const e=DB.entries.find(e=>e.ts===ts); if(!e) return;
+  editingLogTs=ts;
+  document.getElementById('logModalTitle').textContent='Edit Entry';
+  document.getElementById('logSubmitBtn').textContent='Save';
+  document.getElementById('inputName').value=e.name;
+  document.getElementById('inputCal').value=e.cal;
+  document.getElementById('inputPro').value=e.pro;
+  document.getElementById('savedListWrap').style.display='none';
+  document.getElementById('logDivider').style.display='none';
+  document.getElementById('saveNewRow').style.display='none';
+  openModal('logModalBg');
+  setTimeout(()=>document.getElementById('inputName').focus(),120);
+}
+
+function submitLogForm(){
+  const name=document.getElementById('inputName').value.trim();
+  const cal=parseInt(document.getElementById('inputCal').value)||0;
+  const pro=parseInt(document.getElementById('inputPro').value)||0;
+  if(!name){ document.getElementById('inputName').focus(); return; }
+
+  if(editingLogTs!==null){
+    DB.entries=DB.entries.map(e=>e.ts===editingLogTs?{...e,name,cal,pro}:e);
+  } else {
+    const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
+    const entryDate = historyOpen ? historyDate : todayStr();
+    let entryTs = Date.now();
+    if(historyOpen && entryDate !== todayStr()){
+      // set to 11:59 PM on the history date
+      const d = new Date(entryDate + 'T23:59:00');
+      entryTs = d.getTime();
+    }
+    DB.entries=[{name,cal,pro,date:entryDate,ts:entryTs},...DB.entries];
+    if(document.getElementById('saveItem').checked){
+      const saved=DB.saved;
+      if(!saved.find(s=>s.name.toLowerCase()===name.toLowerCase()))
+        DB.saved=[...saved,{name,cal,pro}];
+    }
+    if(!historyOpen){
+      currentTab='day';
+      document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='day'));
+      document.getElementById('app').style.display='';
+      document.getElementById('historyPanel').style.display='none';
+    }
+  }
+  closeLogModal();
+  const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
+  if(historyOpen) renderHistory(); else render();
+}
+
+function closeLogModal(){
+  closeModal('logModalBg');
+  editingLogTs=null; editingSaved=false;
+  document.getElementById('newSavedBtn').style.display='none';
+}
+
+// ── Saved Items ───────────────────────────────────────
+function renderSavedChips(){
+  const saved=DB.saved;
+  const el=document.getElementById('savedList');
+  if(!saved.length){ el.innerHTML='<span style="font-size:11px;color:var(--muted)">No saved items yet</span>'; return; }
+  const sorted=[...saved].map((s,i)=>({...s,origIdx:i})).sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(function(item){
+    const name=item.name, cal=item.cal, origIdx=item.origIdx;
+    const editBtns = editingSaved
+      ? '<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+origIdx+')">✎</button>'
+        + '<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+origIdx+')">×</button>'
+      : '';
+    const clickAttr = editingSaved ? '' : 'onclick="quickAdd('+origIdx+')"';
+    const chipClass = editingSaved ? 'saved-chip' : 'saved-chip normal';
+    return '<span class="'+chipClass+'" '+clickAttr+'>'
+      + '<span>'+esc(name)+' · '+cal+'kcal</span>'
+      + editBtns
+      + '</span>';
+  }).join('');
+}
+function toggleSavedEdit(){
+  editingSaved=!editingSaved;
+  document.getElementById('newSavedBtn').style.display = editingSaved ? '' : 'none';
+  renderSavedChips();
+}
+
+function openNewSavedModal(){
+  editingSavedIdx = null; // null = new item
+  document.getElementById('editSavedTitle').textContent = 'New Saved Item';
+  document.getElementById('editSavedTitle').style.color = 'var(--streak)';
+  document.getElementById('editSavedName').value = '';
+  document.getElementById('editSavedCal').value  = '';
+  document.getElementById('editSavedPro').value  = '';
+  openModal('editSavedBg');
+  setTimeout(()=>document.getElementById('editSavedName').focus(),120);
+}
+
+function deleteSaved(i){
+  const s=DB.saved;
+  showConfirm('Remove "'+s[i].name+'" from saved?', ()=>{
+    s.splice(i,1); DB.saved=s; renderSavedChips();
+  });
+}
+
+function quickAdd(i){
+  const s=DB.saved[i];
+  document.getElementById('inputName').value=s.name;
+  document.getElementById('inputCal').value=s.cal;
+  document.getElementById('inputPro').value=s.pro;
+}
+
+// ── Edit Saved Modal ──────────────────────────────────
+function openEditSavedModal(i){
+  editingSavedIdx=i;
+  const s=DB.saved[i];
+  document.getElementById('editSavedTitle').textContent = 'Edit Saved Item';
+  document.getElementById('editSavedTitle').style.color = 'var(--edit-col)';
+  document.getElementById('editSavedName').value=s.name;
+  document.getElementById('editSavedCal').value=s.cal;
+  document.getElementById('editSavedPro').value=s.pro;
+  openModal('editSavedBg');
+  setTimeout(()=>document.getElementById('editSavedName').focus(),120);
+}
+
+function saveEditedSaved(){
+  const name=document.getElementById('editSavedName').value.trim();
+  const cal=parseInt(document.getElementById('editSavedCal').value)||0;
+  const pro=parseInt(document.getElementById('editSavedPro').value)||0;
+  if(!name){ document.getElementById('editSavedName').focus(); return; }
+  const saved=DB.saved;
+  if(editingSavedIdx===null){
+    // New item
+    saved.push({name,cal,pro});
+  } else {
+    // Edit existing
+    saved[editingSavedIdx]={name,cal,pro};
+  }
+  DB.saved=saved;
+  closeEditSavedModal(); renderSavedChips();
+}
+
+function closeEditSavedModal(){ closeModal('editSavedBg'); editingSavedIdx=null; }
+
+// ── Goals ─────────────────────────────────────────────
+function saveGoals(){
+  DB.goals={cal:parseInt(document.getElementById('goalCal').value)||2000,pro:parseInt(document.getElementById('goalPro').value)||150};
+  render();
+}
+
+// ── History ───────────────────────────────────────────
+let historyDate = todayStr(); // currently viewed date in history
+
+function historyShift(dir){
+  const d = new Date(historyDate + 'T12:00:00');
+  d.setDate(d.getDate() + dir);
+  const next = localDateStr(d);
+  // don't go into the future
+  if(next > todayStr()) return;
+  historyDate = next;
+  renderHistory();
+}
+
+function renderHistory(){
+  const entries = DB.entries.filter(e => e.date === historyDate);
+  const totalCal = entries.reduce((s,e) => s+(e.cal||0), 0);
+  const totalPro = entries.reduce((s,e) => s+(e.pro||0), 0);
+
+  // date label
+  const d = new Date(historyDate + 'T12:00:00');
+  const isToday = historyDate === todayStr();
+  document.getElementById('historyDateLabel').textContent = isToday
+    ? 'TODAY'
+    : d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+
+  // disable next arrow if we're at today
+  document.getElementById('historyNextBtn').disabled = isToday;
+
+  document.getElementById('hCalVal').textContent = totalCal;
+  document.getElementById('hProVal').textContent = totalPro;
+
+  const el = document.getElementById('historyEntries');
+  if(!entries.length){
+    el.innerHTML = '<div class="empty">NO ENTRIES FOR THIS DAY</div>';
+    return;
+  }
+  el.innerHTML = [...entries].sort((a,b)=>b.ts-a.ts).map(e=>`
+    <div class="entry">
+      <div style="flex:1;min-width:0;">
+        <div class="entry-name">${esc(e.name)}</div>
+        <div class="entry-time">${fmtTime(e.ts)}</div>
+      </div>
+      <div class="entry-info">
+        <div class="entry-cal">${e.cal} kcal</div>
+        <div class="entry-pro">${e.pro}g</div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn edit" title="Edit"   onclick="openEditLogModal(${e.ts})">✎</button>
+        <button class="icon-btn del"  title="Delete" onclick="deleteEntryHistory(${e.ts})">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteEntryHistory(ts){
+  const e=DB.entries.find(e=>e.ts===ts);
+  showConfirm('Remove "'+(e?e.name:'this entry')+'"?', ()=>{
+    DB.entries=DB.entries.filter(e=>e.ts!==ts);
+    renderHistory();
+    document.getElementById('streakNum').textContent=calcStreak();
+  });
+}
+
+// ── Confirm Delete ────────────────────────────────────
+let _confirmCallback = null;
+function showConfirm(msg, callback){
+  _confirmCallback = callback;
+  document.getElementById('confirmDeleteMsg').textContent = msg;
+  openModal('confirmDeleteBg');
+}
+function confirmDeleteAction(){
+  closeModal('confirmDeleteBg');
+  if(_confirmCallback) _confirmCallback();
+  _confirmCallback = null;
+}
+function closeConfirm(){
+  closeModal('confirmDeleteBg');
+  _confirmCallback = null;
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function closeModalOutside(e,id){
+  if(e.target!==document.getElementById(id)) return;
+  if(id==='logModalBg') closeLogModal();
+  else if(id==='editSavedBg') closeEditSavedModal();
+  else if(id==='confirmDeleteBg') closeConfirm();
+}
+
+// ── Tabs ──────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    currentTab=t.dataset.tab;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+    // make sure history is closed when switching main tabs
+    document.getElementById('app').style.display='';
+    document.getElementById('historyPanel').style.display='none';
+    document.getElementById('historyFab').classList.remove('active');
+    render();
+  });
+});
+
+// ── History toggle ─────────────────────────────────────
+function toggleHistory(){
+  const panel = document.getElementById('historyPanel');
+  const app   = document.getElementById('app');
+  const fab   = document.getElementById('historyFab');
+  const isOpen = panel.style.display !== 'none';
+  if(isOpen){
+    panel.style.display='none';
+    app.style.display='';
+    fab.classList.remove('active');
+    // restore the previously active tab highlight
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
+  } else {
+    panel.style.display='';
+    app.style.display='none';
+    fab.classList.add('active');
+    // deselect all tabs while in history
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    historyDate = todayStr();
+    renderHistory();
+  }
+}
+
+// ── Keyboard ──────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('logModalBg').classList.contains('open')) submitLogForm();
+    else if(document.getElementById('editSavedBg').classList.contains('open')) saveEditedSaved();
+  }
+  if(e.key==='Escape'){ closeLogModal(); closeEditSavedModal(); }
+});
+
+// ── Init ──────────────────────────────────────────────
+document.querySelector('header h1').textContent = "Food Journal";
+document.getElementById('headerDate').textContent =
+  new Date().toLocaleDateString('en-US', {timeZone: TZ, weekday:'long', month:'long', day:'numeric'}).toUpperCase();
+render();
+</script>
+</body>
+</html>
