@@ -91,7 +91,7 @@
   }
   .progress-header {
     display: flex; justify-content: space-between;
-    font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+    font-size: 11px; letter-spacing: 1.2px;
     color: var(--muted); margin-bottom: 8px;
   }
   .bar-track {
@@ -107,6 +107,14 @@
   .section-label {
     padding: 18px 20px 7px; font-size: 10px;
     letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+  }
+  .panel-header {
+    font-family: 'Lora', serif;
+    font-size: 22px; font-weight: 600;
+    color: #b0b8b0;
+    text-align: center;
+    padding: 18px 20px 14px;
+    letter-spacing: 0.5px;
   }
 
   /* ── Entries ── */
@@ -145,21 +153,60 @@
     background:var(--header-fg); color:var(--btn-fg);
     border:none; border-radius:50%; font-size:26px; cursor:pointer;
     box-shadow:0 4px 20px rgba(137,146,167,.3);
-    transition:transform .15s; z-index:200;
+    transition:transform .15s, background .2s, box-shadow .2s; z-index:200;
     display:flex; align-items:center; justify-content:center;
   }
   .fab:active { transform:scale(.93); }
+  .fab.history-mode { background:var(--accent); box-shadow:0 4px 20px rgba(142,164,162,.35); }
   .fab-history {
-    position:fixed; bottom:28px; left:20px;
     width:54px; height:54px;
     background:var(--surface2); color:var(--text);
     border:1px solid var(--border); border-radius:50%; cursor:pointer;
     box-shadow:0 4px 16px rgba(0,0,0,.3);
-    transition:transform .15s, background .15s; z-index:200;
+    transition:transform .15s, background .15s; z-index:201;
     display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
   }
   .fab-history:active { transform:scale(.93); }
   .fab-history.active { background:var(--accent); color:var(--btn-fg); border-color:var(--accent); }
+
+  .speed-dial {
+    position:fixed; bottom:28px; left:20px;
+    display:flex; flex-direction:column; align-items:flex-start; gap:12px;
+    z-index:200;
+  }
+  .speed-dial-items {
+    display:flex; flex-direction:column; align-items:flex-start; gap:12px;
+    overflow:hidden; max-height:0;
+    transition:max-height .3s ease, opacity .3s ease;
+    opacity:0; pointer-events:none;
+  }
+  .speed-dial-items.open {
+    max-height:200px; opacity:1; pointer-events:auto;
+  }
+  .speed-dial-item {
+    display:flex; align-items:center; gap:10px;
+  }
+  .speed-dial-label {
+    font-family:'DM Mono',monospace; font-size:11px;
+    letter-spacing:1px; text-transform:uppercase;
+    color:var(--muted); background:var(--surface);
+    border:1px solid var(--border); border-radius:6px;
+    padding:4px 8px; white-space:nowrap;
+  }
+
+  /* ── Toast ── */
+  .toast {
+    position:fixed; top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); font-family:'DM Mono',monospace; font-size:12px;
+    letter-spacing:.5px; padding:10px 18px; border-radius:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,.4); z-index:500;
+    opacity:0; pointer-events:none; transition:opacity .2s;
+    white-space:nowrap;
+  }
+  .toast.show { opacity:1; pointer-events:auto; cursor:pointer; }
 
   /* ── Modals ── */
   .modal-bg {
@@ -181,22 +228,38 @@
   /* ── Saved chips ── */
   .saved-mgmt { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
   .saved-list {
-    display:flex; flex-wrap:wrap; gap:8px;
-    margin-bottom:14px; max-height:110px; overflow-y:auto;
+    display:flex; flex-direction:column; gap:6px;
+    margin-bottom:14px; max-height:200px; overflow-y:auto;
   }
   .saved-chip {
     background:var(--surface2); border:1px solid var(--border);
-    border-radius:99px; padding:5px 12px; font-size:11px;
-    cursor:pointer; transition:all .15s; white-space:nowrap;
-    display:inline-flex; align-items:center; gap:6px;
+    border-radius:10px; padding:10px 14px; font-size:12px;
+    cursor:pointer; transition:all .15s;
+    display:flex; align-items:center; gap:8px; width:100%;
   }
   .saved-chip.normal:hover { border-color:var(--chip-hov); color:var(--chip-hov); }
+  .saved-chip.over-limit { border-color:var(--danger) !important; color:var(--danger); }
+  .saved-chip.over-limit:hover { border-color:var(--danger); opacity:.8; }
+  .saved-chip.managing {
+    background:var(--bg); border-color:var(--surface2);
+    cursor:default;
+  }
+  .saved-chip .chip-name { flex:1; }
   .chip-edit-btn, .chip-del-btn {
     background:none; border:none; cursor:pointer;
-    font-size:13px; padding:0; line-height:1; transition:color .15s;
+    font-size:16px; padding:2px 4px; line-height:1;
+    transition:color .15s; flex-shrink:0;
+    border-radius:6px;
   }
   .chip-edit-btn { color:var(--edit-col); }
   .chip-del-btn  { color:var(--danger); }
+  .chip-edit-btn:hover { background:rgba(182,146,123,.15); }
+  .chip-del-btn:hover  { background:rgba(196,116,110,.15); }
+  /* manage mode header styling */
+  .saved-mgmt.managing { 
+    background:var(--bg); border-radius:8px; 
+    padding:6px 10px; border:1px solid var(--border);
+  }
 
   .divider {
     text-align:center; font-size:10px; color:var(--muted);
@@ -206,7 +269,7 @@
   /* ── Form elements ── */
   .form-row      { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
   .form-row.full { grid-template-columns:1fr; }
-  label { display:block; font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:5px; }
+  label { display:block; font-size:10px; color:var(--muted); letter-spacing:1.5px; margin-bottom:5px; }
   input[type=text], input[type=number] {
     width:100%; background:#12120f; border:1px solid var(--border);
     border-radius:8px; padding:11px 12px; color:var(--text);
@@ -233,6 +296,16 @@
     cursor:pointer; font-family:'DM Mono',monospace;
     letter-spacing:1px; text-decoration:underline; padding:0;
   }
+  .new-item-btn {
+    display:block; width:100%;
+    padding:12px; margin-top:4px;
+    background:none; border:1px solid var(--streak);
+    border-radius:10px; color:var(--streak);
+    font-family:'DM Mono',monospace; font-size:12px;
+    letter-spacing:1px; text-transform:uppercase;
+    cursor:pointer; transition:background .15s, color .15s;
+  }
+  .new-item-btn:active { background:var(--streak); color:var(--btn-fg); }
 
   /* ── Goals ── */
   .goals-section { padding:0 20px; margin-top:4px; }
@@ -265,12 +338,11 @@
 <div class="tabs">
   <div class="tab active" data-tab="day">Today</div>
   <div class="tab" data-tab="week">Week</div>
-  <div class="tab" data-tab="month">Month</div>
 </div>
 
 <div id="app">
   <div class="summary">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <div class="stat-card cal">
         <div class="label">Calories</div>
         <div class="value" id="calVal">0</div>
@@ -282,43 +354,37 @@
         <div class="unit">g</div>
       </div>
       <div class="stat-card" id="calRemCard" style="border:1px solid var(--border);">
-        <div class="label">Left</div>
+        <div class="label">Calories Left</div>
         <div style="font-family:'Outfit',sans-serif;font-size:34px;font-weight:700;line-height:1.1;margin-top:4px;" id="calRemVal">2000</div>
-        <div class="unit">kcal</div>
+        <div class="unit" id="calRemUnit">kcal</div>
+      </div>
+      <div class="stat-card" id="proRemCard" style="border:1px solid var(--border);">
+        <div class="label">Protein Left</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:34px;font-weight:700;line-height:1.1;margin-top:4px;" id="proRemVal">150</div>
+        <div class="unit" id="proRemUnit">g</div>
       </div>
     </div>
     <div class="progress-wrap">
-      <div class="progress-header"><span>Calories</span><span id="calGoalLabel">/ 2000 kcal</span></div>
+      <div class="progress-header"><span>CALORIES</span><span id="calGoalLabel">/ 2000 kcal</span></div>
       <div class="bar-track"><div class="bar-fill cal" id="calBar" style="width:0%"></div></div>
-      <div class="progress-header"><span>Protein</span><span id="proGoalLabel">/ 150g</span></div>
+      <div class="progress-header"><span>PROTEIN</span><span id="proGoalLabel">/ 150g</span></div>
       <div class="bar-track"><div class="bar-fill pro" id="proBar" style="width:0%"></div></div>
     </div>
   </div>
 
   <div class="section-label" id="sectionLabel">Today's Log</div>
   <div class="entries" id="entries"></div>
-
-  <div class="section-label">Goals</div>
-  <div class="goals-section">
-    <div class="goals-card">
-      <h3>Daily Goals</h3>
-      <div class="form-row">
-        <div><label>Calorie Goal</label><input type="number" id="goalCal" placeholder="2000"></div>
-        <div><label>Protein Goal (g)</label><input type="number" id="goalPro" placeholder="150"></div>
-      </div>
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="saveGoals()">Save Goals</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- ══ HISTORY PANEL ══ -->
-<div id="historyPanel" style="display:none;padding:0 20px;">
-  <div style="padding:18px 0 10px;display:flex;align-items:center;gap:10px;">
-    <button class="icon-btn" onclick="historyShift(-1)" style="font-size:20px;color:var(--text);">‹</button>
-    <div id="historyDateLabel" style="flex:1;text-align:center;font-size:13px;letter-spacing:1px;"></div>
-    <button class="icon-btn" onclick="historyShift(1)" style="font-size:20px;color:var(--text);" id="historyNextBtn">›</button>
+<div id="historyPanel" style="display:none;padding:0 20px 40px;">
+  <div class="panel-header">History</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <button onclick="historyShift(-1)"
+      style="width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;">‹</button>
+    <div id="historyDateLabel" style="flex:1;text-align:center;font-size:12px;letter-spacing:1px;color:var(--muted);"></div>
+    <button onclick="historyShift(1)" id="historyNextBtn"
+      style="width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;">›</button>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
     <div class="stat-card cal">
@@ -335,14 +401,107 @@
   <div class="entries" id="historyEntries"></div>
 </div>
 
-<button class="fab" onclick="openAddModal()">+</button>
-<button class="fab-history" id="historyFab" onclick="toggleHistory()">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="3" y1="6"  x2="21" y2="6"/>
-    <line x1="3" y1="12" x2="21" y2="12"/>
-    <line x1="3" y1="18" x2="21" y2="18"/>
-  </svg>
-</button>
+<!-- ══ GOALS PANEL ══ -->
+<!-- ══ MANAGE QUICK-ADD PANEL ══ -->
+<div id="managePanel" style="display:none;padding:0 20px 40px;">
+  <div class="panel-header">Quick-Add</div>
+  <div class="goals-card" style="padding:0;">
+    <div class="saved-list" id="managePanelList"></div>
+  </div>
+  <div style="display:flex;justify-content:center;margin-top:14px;">
+    <button class="new-item-btn" onclick="openNewSavedModal()">+ New Item</button>
+  </div>
+</div>
+
+<div id="goalsPanel" style="display:none;padding:0 20px 40px;">
+  <div class="panel-header">Goals</div>
+  <div class="goals-card">
+    <!-- Mode toggle -->
+    <div style="display:flex;gap:0;margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+      <button id="goalModeDaily" onclick="setGoalMode('daily')"
+        style="flex:1;padding:9px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;border:none;cursor:pointer;transition:all .2s;background:var(--header-fg);color:var(--btn-fg);">
+        Daily
+      </button>
+      <button id="goalModeWeekly" onclick="setGoalMode('weekly')"
+        style="flex:1;padding:9px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;border:none;cursor:pointer;transition:all .2s;background:var(--surface2);color:var(--muted);">
+        Weekly
+      </button>
+    </div>
+    <!-- Daily fields -->
+    <div id="goalFieldsDaily">
+      <div class="form-row">
+        <div><label>CALORIE GOAL (kcal)</label><input type="number" id="goalCal" placeholder="2000"></div>
+        <div><label>PROTEIN GOAL (g)</label><input type="number" id="goalPro" placeholder="150"></div>
+      </div>
+    </div>
+    <!-- Weekly fields -->
+    <div id="goalFieldsWeekly" style="display:none;">
+      <div style="font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">CALORIE GOAL <span style="text-transform:lowercase;">(kcal)</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;" id="weeklyDayFields"></div>
+      <div>
+        <label>PROTEIN GOAL (g)</label>
+        <input type="number" id="goalProWeekly" placeholder="150">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveGoals()">Save Goals</button>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="addFab" onclick="openAddModal()">+</button>
+
+<!-- ══ SPEED DIAL ══ -->
+<div class="speed-dial" id="speedDial">
+  <!-- Sub buttons (hidden by default, expand upward) -->
+  <div class="speed-dial-items" id="speedDialItems">
+    <div class="speed-dial-item">
+      <button class="fab-history" id="manageFab" onclick="toggleManage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="2" width="8" height="3" rx="1.5"/>
+          <rect x="4" y="4" width="16" height="18" rx="2"/>
+          <circle cx="12" cy="4" r="1"/>
+          <line x1="8" y1="10" x2="16" y2="10"/>
+          <line x1="8" y1="13" x2="16" y2="13"/>
+          <line x1="8" y1="16" x2="16" y2="16"/>
+          <circle cx="6.5" cy="10" r="1" fill="currentColor"/>
+          <circle cx="6.5" cy="13" r="1" fill="currentColor"/>
+          <circle cx="6.5" cy="16" r="1" fill="currentColor"/>
+        </svg>
+      </button>
+      <span class="speed-dial-label">Quick-Add</span>
+    </div>
+    <div class="speed-dial-item">
+      <button class="fab-history" id="historyFab" onclick="toggleHistory()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74"/>
+          <polyline points="3 3 3 8 8 8"/>
+          <polyline points="12 7 12 12 15 15"/>
+        </svg>
+      </button>
+      <span class="speed-dial-label">History</span>
+    </div>
+    <div class="speed-dial-item">
+      <button class="fab-history" id="goalsFab" onclick="toggleGoals()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+          <line x1="4" y1="22" x2="4" y2="15"/>
+        </svg>
+      </button>
+      <span class="speed-dial-label">Goals</span>
+    </div>
+  </div>
+  <!-- Main trigger button -->
+  <button class="fab-history" id="speedDialBtn" onclick="toggleSpeedDial()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6"  x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</div>
+
+<div id="toast" class="toast" onclick="hideToast()"></div>
 
 <!-- ══ LOG / EDIT ENTRY MODAL ══ -->
 <div class="modal-bg" id="logModalBg" onclick="closeModalOutside(event,'logModalBg')">
@@ -350,9 +509,8 @@
     <h2 id="logModalTitle">Log Food</h2>
 
     <div id="savedListWrap">
-      <div class="saved-mgmt">
+      <div class="saved-mgmt" id="savedMgmt">
         <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Quick-Add</span>
-        <button class="toggle-saved" id="manageSavedBtn" onclick="toggleSavedEdit()">manage</button>
         <button class="toggle-saved" id="newSavedBtn" style="display:none;color:var(--streak)" onclick="openNewSavedModal()">+ new item</button>
       </div>
       <div class="saved-list" id="savedList"></div>
@@ -360,11 +518,11 @@
     <div class="divider" id="logDivider">— or enter manually —</div>
 
     <div class="form-row full">
-      <div><label>Food Name</label><input type="text" id="inputName" placeholder="e.g. Chicken breast"></div>
+      <div><label>FOOD NAME</label><input type="text" id="inputName" placeholder="e.g. Chicken breast"></div>
     </div>
     <div class="form-row">
-      <div><label>Calories (kcal)</label><input type="number" id="inputCal" placeholder="300"></div>
-      <div><label>Protein (g)</label><input type="number" id="inputPro" placeholder="25"></div>
+      <div><label>CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="300"></div>
+      <div><label>PROTEIN (g)</label><input type="number" id="inputPro" placeholder="25"></div>
     </div>
     <div class="checkbox-row" id="saveNewRow">
       <input type="checkbox" id="saveItem">
@@ -393,11 +551,11 @@
   <div class="modal">
     <h2 id="editSavedTitle" style="color:var(--edit-col)">Edit Saved Item</h2>
     <div class="form-row full">
-      <div><label>Food Name</label><input type="text" id="editSavedName" placeholder="Name"></div>
+      <div><label>FOOD NAME</label><input type="text" id="editSavedName" placeholder="Name"></div>
     </div>
     <div class="form-row">
-      <div><label>Calories (kcal)</label><input type="number" id="editSavedCal" placeholder="0"></div>
-      <div><label>Protein (g)</label><input type="number" id="editSavedPro" placeholder="0"></div>
+      <div><label>CALORIES (kcal)</label><input type="number" id="editSavedCal" placeholder="0"></div>
+      <div><label>PROTEIN (g)</label><input type="number" id="editSavedPro" placeholder="0"></div>
     </div>
     <div class="form-actions">
       <button class="btn btn-secondary" onclick="closeEditSavedModal()">Cancel</button>
@@ -413,7 +571,7 @@ const DB = {
   set entries(v){ localStorage.setItem('fl_entries',JSON.stringify(v)) },
   get saved()  { try{return JSON.parse(localStorage.getItem('fl_saved')||'[]')}catch{return[]} },
   set saved(v) { localStorage.setItem('fl_saved',JSON.stringify(v)) },
-  get goals()  { try{return JSON.parse(localStorage.getItem('fl_goals')||'{"cal":2000,"pro":150}')}catch{return{cal:2000,pro:150}} },
+  get goals()  { try{return JSON.parse(localStorage.getItem('fl_goals')||'{"cal":2000,"pro":150,"mode":"daily","weekly":[2000,2000,2000,2000,2000,2000,2000]}')}catch{return{cal:2000,pro:150,mode:'daily',weekly:[2000,2000,2000,2000,2000,2000,2000]}} },
   set goals(v) { localStorage.setItem('fl_goals',JSON.stringify(v)) },
 };
 
@@ -433,19 +591,13 @@ const fmtTime = ts => new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:
 function getDateRange(tab){
   const now = new Date();
   if(tab==='day'){ const s=todayStr(); return{start:s,end:s}; }
-  if(tab==='week'){
-    const d=new Date(now);
-    // getDay(): 0=Sun,1=Mon...6=Sat — shift so week starts Monday
-    const dayOfWeek = d.getDay();
-    const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
-    d.setDate(d.getDate() + diffToMon);
-    const start=localDateStr(d);
-    const e=new Date(d); e.setDate(e.getDate()+6);
-    return{start,end:localDateStr(e)};
-  }
-  const start=localDateStr(new Date(now.getFullYear(),now.getMonth(),1));
-  const end  =localDateStr(new Date(now.getFullYear(),now.getMonth()+1,0));
-  return{start,end};
+  const d=new Date(now);
+  const dayOfWeek = d.getDay();
+  const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
+  d.setDate(d.getDate() + diffToMon);
+  const start=localDateStr(d);
+  const e=new Date(d); e.setDate(e.getDate()+6);
+  return{start,end:localDateStr(e)};
 }
 
 // ── Streak ───────────────────────────────────────────
@@ -469,16 +621,31 @@ function calcStreak(){
 // ── Render ───────────────────────────────────────────
 function render(){
   const goals=DB.goals;
-  document.getElementById('goalCal').value=goals.cal;
-  document.getElementById('goalPro').value=goals.pro;
   document.getElementById('streakNum').textContent=calcStreak();
 
   const {start,end}=getDateRange(currentTab);
   const entries=DB.entries.filter(e=>e.date>=start&&e.date<=end);
   const totalCal=entries.reduce((s,e)=>s+(e.cal||0),0);
   const totalPro=entries.reduce((s,e)=>s+(e.pro||0),0);
-  const mult=currentTab==='week'?7:currentTab==='month'?30:1;
-  const goalCal=goals.cal*mult, goalPro=goals.pro*mult;
+
+  // Compute goalCal based on mode
+  let goalCal, goalPro;
+  const weekly = goals.weekly || [2000,2000,2000,2000,2000,2000,2000];
+  const weeklyTotal = weekly.reduce((s,v)=>s+v,0);
+  if(goals.mode==='weekly'){
+    if(currentTab==='day'){
+      const dow = new Date().getDay();
+      const idx = dow===0 ? 6 : dow-1;
+      goalCal = weekly[idx];
+    } else {
+      goalCal = weeklyTotal;
+    }
+  } else {
+    const mult = currentTab==='week' ? 7 : 1;
+    goalCal = goals.cal * mult;
+  }
+  const proMult = currentTab==='week' ? 7 : 1;
+  goalPro = (goals.mode==='weekly' ? (goals.proWeekly||goals.pro) : goals.pro) * proMult;
 
   document.getElementById('calVal').textContent=totalCal;
   document.getElementById('proVal').textContent=totalPro;
@@ -487,30 +654,36 @@ function render(){
   document.getElementById('calGoalLabel').textContent=`/ ${goalCal} kcal`;
   document.getElementById('proGoalLabel').textContent=`/ ${goalPro}g`;
 
-  // Calories remaining (only meaningful for day view)
-  const remCard = document.getElementById('calRemCard');
-  const remVal  = document.getElementById('calRemVal');
-  if(currentTab !== 'none'){
-    remCard.style.display = '';
-    const rem = (currentTab === 'day' ? goals.cal : goalCal) - totalCal;
-    remVal.textContent = rem;
-    if(rem >= 0){
-      remVal.style.color = rem < goalCal * 0.15 ? 'var(--tab-act)' : 'var(--text)';
-      remCard.querySelector('.unit').textContent = 'kcal left';
-      remCard.style.borderColor = 'var(--border)';
-    } else {
-      remVal.style.color = 'var(--danger)';
-      remCard.querySelector('.unit').textContent = 'kcal over';
-      remCard.style.borderColor = 'var(--danger)';
-    }
+  // Calories & Protein remaining
+  const remCard    = document.getElementById('calRemCard');
+  const remVal     = document.getElementById('calRemVal');
+  const proRemCard = document.getElementById('proRemCard');
+  const proRemVal  = document.getElementById('proRemVal');
+
+  const calRem = (currentTab === 'day' ? goals.cal : goalCal) - totalCal;
+  remVal.textContent = calRem;
+  if(calRem >= 0){
+    remVal.style.color = calRem < goalCal * 0.15 ? 'var(--tab-act)' : 'var(--text)';
+    document.getElementById('calRemUnit').textContent = 'kcal left';
+    remCard.style.borderColor = 'var(--border)';
+  } else {
+    remVal.style.color = 'var(--danger)';
+    document.getElementById('calRemUnit').textContent = 'limit exceeded! ⚠️';
+    remCard.style.borderColor = 'var(--danger)';
   }
 
-  const labels={day:"Today's Log",week:"This Week's Log",month:"This Month's Log"};
+  const proRem = (currentTab === 'day' ? goals.pro : goalPro) - totalPro;
+  proRemVal.textContent = Math.max(0, proRem);
+  proRemVal.style.color = proRem <= 0 ? 'var(--streak)' : proRem < goalPro * 0.15 ? 'var(--tab-act)' : 'var(--text)';
+  document.getElementById('proRemUnit').textContent = proRem <= 0 ? 'goal hit! 💪' : 'g left';
+  proRemCard.style.borderColor = proRem <= 0 ? 'var(--streak)' : 'var(--border)';
+
+  const labels={day:"Today's Log",week:"This Week's Log"};
   document.getElementById('sectionLabel').textContent=labels[currentTab];
 
   const el=document.getElementById('entries');
   if(!entries.length){ el.innerHTML='<div class="empty">NO ENTRIES YET</div>'; return; }
-  el.innerHTML=[...entries].sort((a,b)=>b.ts-a.ts).map(e=>`
+  el.innerHTML=[...entries].sort((a,b)=>a.ts-b.ts).map(e=>`
     <div class="entry">
       <div style="flex:1;min-width:0;">
         <div class="entry-name">${esc(e.name)}</div>
@@ -535,6 +708,45 @@ function deleteEntry(ts){
     DB.entries=DB.entries.filter(e=>e.ts!==ts);
     render();
   });
+}
+
+function renderManagePanel(){
+  const saved = DB.saved;
+  const el = document.getElementById('managePanelList');
+  if(!saved.length){ el.innerHTML='<div class="empty" style="padding:20px 0;">NO SAVED ITEMS YET</div>'; return; }
+  const sorted = [...saved].map((s,i)=>({...s,origIdx:i})).sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML = sorted.map(function(item){
+    return '<span class="saved-chip managing">'
+      + '<span class="chip-name">'+esc(item.name)+' · '+item.cal+'kcal · '+item.pro+'g</span>'
+      + '<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+item.origIdx+')">✎</button>'
+      + '<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+item.origIdx+')">×</button>'
+      + '</span>';
+  }).join('');
+}
+
+function toggleManage(){
+  closeSpeedDial();
+  const panel  = document.getElementById('managePanel');
+  const app    = document.getElementById('app');
+  const hPanel = document.getElementById('historyPanel');
+  const gPanel = document.getElementById('goalsPanel');
+  const fab    = document.getElementById('manageFab');
+  const isOpen = panel.style.display !== 'none';
+  if(isOpen){
+    panel.style.display='none';
+    app.style.display='';
+    fab.classList.remove('active');
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
+  } else {
+    hPanel.style.display='none'; document.getElementById('historyFab').classList.remove('active');
+    gPanel.style.display='none'; document.getElementById('goalsFab').classList.remove('active');
+    panel.style.display='';
+    app.style.display='none';
+    fab.classList.add('active');
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    editingSaved = true;
+    renderManagePanel();
+  }
 }
 
 function openAddModal(){
@@ -591,6 +803,8 @@ function submitLogForm(){
       const saved=DB.saved;
       if(!saved.find(s=>s.name.toLowerCase()===name.toLowerCase()))
         DB.saved=[...saved,{name,cal,pro}];
+      else
+        showToast('"'+name+'" is already in quick-add');
     }
     if(!historyOpen){
       currentTab='day';
@@ -608,6 +822,7 @@ function closeLogModal(){
   closeModal('logModalBg');
   editingLogTs=null; editingSaved=false;
   document.getElementById('newSavedBtn').style.display='none';
+  document.getElementById('savedMgmt').classList.remove('managing');
 }
 
 // ── Saved Items ───────────────────────────────────────
@@ -616,16 +831,26 @@ function renderSavedChips(){
   const el=document.getElementById('savedList');
   if(!saved.length){ el.innerHTML='<span style="font-size:11px;color:var(--muted)">No saved items yet</span>'; return; }
   const sorted=[...saved].map((s,i)=>({...s,origIdx:i})).sort((a,b)=>a.name.localeCompare(b.name));
+
+  // Calculate calories remaining today for colour coding
+  const goals=DB.goals;
+  const todayEntries=DB.entries.filter(e=>e.date===todayStr());
+  const todayTotal=todayEntries.reduce((s,e)=>s+(e.cal||0),0);
+  const dailyGoal=goals.cal||2000;
+  const calLeft=dailyGoal-todayTotal;
+
   el.innerHTML=sorted.map(function(item){
-    const name=item.name, cal=item.cal, origIdx=item.origIdx;
+    const name=item.name, cal=item.cal, pro=item.pro||0, origIdx=item.origIdx;
     const editBtns = editingSaved
       ? '<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+origIdx+')">✎</button>'
         + '<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+origIdx+')">×</button>'
       : '';
     const clickAttr = editingSaved ? '' : 'onclick="quickAdd('+origIdx+')"';
-    const chipClass = editingSaved ? 'saved-chip' : 'saved-chip normal';
+    const overLimit = !editingSaved && cal > calLeft;
+    const chipClass = editingSaved ? 'saved-chip managing' : 'saved-chip normal' + (overLimit ? ' over-limit' : '');
+    const proStr = pro > 0 ? ' · <span style="color:var(--accent2)">'+pro+'g</span>' : '';
     return '<span class="'+chipClass+'" '+clickAttr+'>'
-      + '<span>'+esc(name)+' · '+cal+'kcal</span>'
+      + '<span class="chip-name">'+esc(name)+' <span style="color:var(--muted)">'+cal+'kcal</span>'+proStr+'</span>'
       + editBtns
       + '</span>';
   }).join('');
@@ -633,6 +858,7 @@ function renderSavedChips(){
 function toggleSavedEdit(){
   editingSaved=!editingSaved;
   document.getElementById('newSavedBtn').style.display = editingSaved ? '' : 'none';
+  document.getElementById('savedMgmt').classList.toggle('managing', editingSaved);
   renderSavedChips();
 }
 
@@ -650,7 +876,9 @@ function openNewSavedModal(){
 function deleteSaved(i){
   const s=DB.saved;
   showConfirm('Remove "'+s[i].name+'" from saved?', ()=>{
-    s.splice(i,1); DB.saved=s; renderSavedChips();
+    s.splice(i,1); DB.saved=s;
+    renderSavedChips();
+    if(document.getElementById('managePanel').style.display !== 'none') renderManagePanel();
   });
 }
 
@@ -688,14 +916,80 @@ function saveEditedSaved(){
     saved[editingSavedIdx]={name,cal,pro};
   }
   DB.saved=saved;
-  closeEditSavedModal(); renderSavedChips();
+  closeEditSavedModal();
+  renderSavedChips();
+  if(document.getElementById('managePanel').style.display !== 'none') renderManagePanel();
 }
 
 function closeEditSavedModal(){ closeModal('editSavedBg'); editingSavedIdx=null; }
 
+// ── Toast ─────────────────────────────────────────────
+let _toastTimeout = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if(_toastTimeout) clearTimeout(_toastTimeout);
+  document.addEventListener('click', hideToast, {once:true, capture:true});
+}
+function hideToast(){
+  document.getElementById('toast').classList.remove('show');
+  if(_toastTimeout){ clearTimeout(_toastTimeout); _toastTimeout=null; }
+}
+
 // ── Goals ─────────────────────────────────────────────
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+function initGoalsUI(){
+  const goals = DB.goals;
+  const mode = goals.mode || 'daily';
+  setGoalMode(mode, true);
+  // populate weekly fields
+  const weekly = goals.weekly || [2000,2000,2000,2000,2000,2000,2000];
+  DAYS.forEach((d,i)=>{
+    const el = document.getElementById('weeklyDay'+i);
+    if(el) el.value = weekly[i];
+  });
+  if(document.getElementById('goalProWeekly'))
+    document.getElementById('goalProWeekly').value = goals.proWeekly || goals.pro || 150;
+}
+
+function setGoalMode(mode, silent){
+  const isWeekly = mode==='weekly';
+  document.getElementById('goalFieldsDaily').style.display  = isWeekly ? 'none' : '';
+  document.getElementById('goalFieldsWeekly').style.display = isWeekly ? '' : 'none';
+  document.getElementById('goalModeDaily').style.background  = isWeekly ? 'var(--surface2)' : 'var(--header-fg)';
+  document.getElementById('goalModeDaily').style.color       = isWeekly ? 'var(--muted)'    : 'var(--btn-fg)';
+  document.getElementById('goalModeWeekly').style.background = isWeekly ? 'var(--header-fg)': 'var(--surface2)';
+  document.getElementById('goalModeWeekly').style.color      = isWeekly ? 'var(--btn-fg)'   : 'var(--muted)';
+
+  // Build weekly day fields if not yet built
+  if(isWeekly && !document.getElementById('weeklyDay0')){
+    const goals = DB.goals;
+    const weekly = goals.weekly || [2000,2000,2000,2000,2000,2000,2000];
+    document.getElementById('weeklyDayFields').innerHTML = DAYS.map((d,i)=>`
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:11px;color:var(--muted);width:36px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;">${d.slice(0,3)}</span>
+        <input type="number" id="weeklyDay${i}" placeholder="2000" value="${weekly[i]}"
+          style="flex:1;background:#12120f;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;">
+      </div>
+    `).join('');
+  }
+  if(!silent){ const g=DB.goals; g.mode=mode; DB.goals=g; render(); }
+}
+
 function saveGoals(){
-  DB.goals={cal:parseInt(document.getElementById('goalCal').value)||2000,pro:parseInt(document.getElementById('goalPro').value)||150};
+  const goals = DB.goals;
+  const mode = goals.mode || 'daily';
+  if(mode==='weekly'){
+    const weekly = DAYS.map((_,i)=>parseInt(document.getElementById('weeklyDay'+i).value)||2000);
+    const proWeekly = parseInt(document.getElementById('goalProWeekly').value)||150;
+    DB.goals={...goals, mode:'weekly', weekly, proWeekly, pro:proWeekly};
+  } else {
+    const cal=parseInt(document.getElementById('goalCal').value)||2000;
+    const pro=parseInt(document.getElementById('goalPro').value)||150;
+    DB.goals={...goals, mode:'daily', cal, pro};
+  }
   render();
 }
 
@@ -735,7 +1029,7 @@ function renderHistory(){
     el.innerHTML = '<div class="empty">NO ENTRIES FOR THIS DAY</div>';
     return;
   }
-  el.innerHTML = [...entries].sort((a,b)=>b.ts-a.ts).map(e=>`
+  el.innerHTML = [...entries].sort((a,b)=>a.ts-b.ts).map(e=>`
     <div class="entry">
       <div style="flex:1;min-width:0;">
         <div class="entry-name">${esc(e.name)}</div>
@@ -792,31 +1086,84 @@ document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
     currentTab=t.dataset.tab;
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
-    // make sure history is closed when switching main tabs
+    // close all panels when switching main tabs
+    closeSpeedDial();
     document.getElementById('app').style.display='';
     document.getElementById('historyPanel').style.display='none';
     document.getElementById('historyFab').classList.remove('active');
+    document.getElementById('addFab').classList.remove('history-mode');
+    document.getElementById('goalsPanel').style.display='none';
+    document.getElementById('goalsFab').classList.remove('active');
+    document.getElementById('managePanel').style.display='none';
+    document.getElementById('manageFab').classList.remove('active');
     render();
   });
 });
 
+// ── Speed Dial ────────────────────────────────────────
+function toggleSpeedDial(){
+  const items = document.getElementById('speedDialItems');
+  const btn   = document.getElementById('speedDialBtn');
+  const isOpen = items.classList.contains('open');
+  items.classList.toggle('open', !isOpen);
+  btn.classList.toggle('active', !isOpen);
+}
+function closeSpeedDial(){
+  document.getElementById('speedDialItems').classList.remove('open');
+  document.getElementById('speedDialBtn').classList.remove('active');
+}
+
+// ── Goals toggle ───────────────────────────────────────
+function toggleGoals(){
+  closeSpeedDial();
+  const panel = document.getElementById('goalsPanel');
+  const app   = document.getElementById('app');
+  const hPanel= document.getElementById('historyPanel');
+  const fab   = document.getElementById('goalsFab');
+  const isOpen = panel.style.display !== 'none';
+  if(isOpen){
+    panel.style.display='none';
+    app.style.display='';
+    fab.classList.remove('active');
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
+  } else {
+    // close history and manage if open
+    hPanel.style.display='none';
+    document.getElementById('historyFab').classList.remove('active');
+    document.getElementById('managePanel').style.display='none';
+    document.getElementById('manageFab').classList.remove('active');
+    panel.style.display='';
+    app.style.display='none';
+    fab.classList.add('active');
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    initGoalsUI();
+  }
+}
+
 // ── History toggle ─────────────────────────────────────
 function toggleHistory(){
+  closeSpeedDial();
   const panel = document.getElementById('historyPanel');
   const app   = document.getElementById('app');
+  const gPanel= document.getElementById('goalsPanel');
   const fab   = document.getElementById('historyFab');
   const isOpen = panel.style.display !== 'none';
   if(isOpen){
     panel.style.display='none';
     app.style.display='';
     fab.classList.remove('active');
-    // restore the previously active tab highlight
+    document.getElementById('addFab').classList.remove('history-mode');
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
   } else {
+    // close goals and manage if open
+    gPanel.style.display='none';
+    document.getElementById('goalsFab').classList.remove('active');
+    document.getElementById('managePanel').style.display='none';
+    document.getElementById('manageFab').classList.remove('active');
     panel.style.display='';
     app.style.display='none';
     fab.classList.add('active');
-    // deselect all tabs while in history
+    document.getElementById('addFab').classList.add('history-mode');
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     historyDate = todayStr();
     renderHistory();
@@ -824,6 +1171,12 @@ function toggleHistory(){
 }
 
 // ── Keyboard ──────────────────────────────────────────
+document.addEventListener('click', e => {
+  const dial = document.getElementById('speedDial');
+  if(dial && !dial.contains(e.target)){
+    closeSpeedDial();
+  }
+});
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
     if(document.getElementById('logModalBg').classList.contains('open')) submitLogForm();
