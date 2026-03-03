@@ -176,29 +176,23 @@
   .fab-history.active { background:var(--accent); color:var(--btn-fg); border-color:var(--accent); }
 
   .speed-dial {
-    position:fixed; bottom:28px; left:20px;
-    display:flex; flex-direction:column; align-items:flex-start; gap:12px;
-    z-index:200;
+    position:fixed; bottom:28px; left:20px; z-index:200;
   }
-  .speed-dial-items {
-    display:flex; flex-direction:column; align-items:flex-start; gap:12px;
-    overflow:hidden; max-height:0;
-    transition:max-height .3s ease, opacity .3s ease;
-    opacity:0; pointer-events:none;
+  .speed-dial-trigger { display:flex; }
+  .speed-dial-panel {
+    display:none; flex-direction:column; gap:8px;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:20px; padding:12px;
+    box-shadow:0 4px 24px rgba(0,0,0,.4);
   }
-  .speed-dial-items.open {
-    max-height:320px; opacity:1; pointer-events:auto;
-  }
-  .speed-dial-item {
-    display:flex; align-items:center; gap:10px;
-  }
+  .speed-dial-panel.open { display:flex; }
+  .speed-dial-item { display:flex; flex-direction:row; align-items:center; gap:10px; }
   .speed-dial-label {
     font-family:'DM Mono',monospace; font-size:11px;
-    letter-spacing:1px; text-transform:uppercase;
-    color:var(--text); background:var(--surface2);
-    border:1px solid var(--accent); border-radius:6px;
-    padding:5px 10px; white-space:nowrap;
+    letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--text); white-space:nowrap;
   }
+  .speed-dial-divider { height:1px; background:var(--border); margin:2px 0; }
 
   /* ── Toast ── */
   .toast {
@@ -468,20 +462,20 @@
 
 <!-- ══ SPEED DIAL ══ -->
 <div class="speed-dial" id="speedDial">
-  <!-- Sub buttons (hidden by default, expand upward) -->
-  <div class="speed-dial-items" id="speedDialItems">
-<div class="speed-dial-item">
+  <div class="speed-dial-trigger" id="speedDialTrigger">
+    <button class="fab-history" id="speedDialBtn" onclick="toggleSpeedDial()">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="speed-dial-panel" id="speedDialItems">
+    <div class="speed-dial-item">
       <button class="fab-history" id="manageFab" onclick="toggleManage()">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="8" y="2" width="8" height="3" rx="1.5"/>
-          <rect x="4" y="4" width="16" height="18" rx="2"/>
-          <circle cx="12" cy="4" r="1"/>
-          <line x1="8" y1="10" x2="16" y2="10"/>
-          <line x1="8" y1="13" x2="16" y2="13"/>
-          <line x1="8" y1="16" x2="16" y2="16"/>
-          <circle cx="6.5" cy="10" r="1" fill="currentColor"/>
-          <circle cx="6.5" cy="13" r="1" fill="currentColor"/>
-          <circle cx="6.5" cy="16" r="1" fill="currentColor"/>
+          <rect x="8" y="2" width="8" height="3" rx="1.5"/><rect x="4" y="4" width="16" height="18" rx="2"/>
+          <circle cx="12" cy="4" r="1"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="16" x2="16" y2="16"/>
+          <circle cx="6.5" cy="10" r="1" fill="currentColor"/><circle cx="6.5" cy="13" r="1" fill="currentColor"/><circle cx="6.5" cy="16" r="1" fill="currentColor"/>
         </svg>
       </button>
       <span class="speed-dial-label">Quick-Add</span>
@@ -490,8 +484,7 @@
       <button class="fab-history" id="historyFab" onclick="toggleHistory()">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74"/>
-          <polyline points="3 3 3 8 8 8"/>
-          <polyline points="12 7 12 12 15 15"/>
+          <polyline points="3 3 3 8 8 8"/><polyline points="12 7 12 12 15 15"/>
         </svg>
       </button>
       <span class="speed-dial-label">History</span>
@@ -505,15 +498,15 @@
       </button>
       <span class="speed-dial-label">Goals</span>
     </div>
+    <div class="speed-dial-divider"></div>
+    <div class="speed-dial-item">
+      <button class="fab-history" id="speedDialBtnInner" onclick="toggleSpeedDial()">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
   </div>
-  <!-- Main trigger button -->
-  <button class="fab-history" id="speedDialBtn" onclick="toggleSpeedDial()">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="3" y1="6"  x2="21" y2="6"/>
-      <line x1="3" y1="12" x2="21" y2="12"/>
-      <line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
 </div>
 
 <div id="toast" class="toast" onclick="hideToast()"></div>
@@ -766,6 +759,7 @@ function toggleManage(){
     window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0;
     editingSaved = true;
     renderManagePanel();
+    setTimeout(()=>{ document.getElementById('managePanel').scrollTop=0; document.getElementById('managePanelList').scrollTop=0; },10);
   }
 }
 
@@ -795,6 +789,7 @@ function openAddModal(){
   document.getElementById('saveNewRow').style.display='';
   editingSaved=false;
   renderSavedChips();
+  setTimeout(()=>{ const sl=document.getElementById('savedList'); if(sl) sl.scrollTop=0; },10);
   openModal('logModalBg');
   setTimeout(()=>document.getElementById('inputName').focus(),120);
 }
@@ -1167,14 +1162,16 @@ document.querySelectorAll('.tab').forEach(t=>{
 
 // ── Speed Dial ────────────────────────────────────────
 function toggleSpeedDial(){
-  const items = document.getElementById('speedDialItems');
-  const btn   = document.getElementById('speedDialBtn');
-  const isOpen = items.classList.contains('open');
-  items.classList.toggle('open', !isOpen);
-  btn.classList.toggle('active', !isOpen);
+  const panel  = document.getElementById('speedDialItems');
+  const trigger= document.getElementById('speedDialTrigger');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  trigger.style.display = isOpen ? 'flex' : 'none';
+  document.getElementById('speedDialBtn').classList.toggle('active', !isOpen);
 }
 function closeSpeedDial(){
   document.getElementById('speedDialItems').classList.remove('open');
+  document.getElementById('speedDialTrigger').style.display = 'flex';
   document.getElementById('speedDialBtn').classList.remove('active');
 }
 
@@ -1227,6 +1224,8 @@ function openHistory(){
   document.getElementById('managePanel').style.display='none';
   document.getElementById('manageFab').classList.remove('active');
   document.getElementById('historyPanel').style.display='';
+  document.getElementById('historyPanel').scrollTop=0;
+  document.getElementById('historyEntries').scrollTop=0;
   document.getElementById('app').style.display='none';
   document.getElementById('historyFab').classList.add('active');
   document.getElementById('addFab').classList.add('history-mode');
