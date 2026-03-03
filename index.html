@@ -801,6 +801,7 @@ function setQuickTab(tab){
   document.getElementById('quickTabCombos').style.color=isCombo?'var(--btn-fg)':'var(--muted)';
   document.getElementById('quickItemsView').style.display=isCombo?'none':'flex';
   document.getElementById('quickCombosView').style.display=isCombo?'flex':'none';
+  scrollAllToTop();
   if(isCombo)renderManageCombos();else renderManagePanel();
 }
 
@@ -873,7 +874,7 @@ function toggleManage(){
     panel.style.display='';document.getElementById('app').style.display='none';
     document.getElementById('manageFab').classList.add('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
+    scrollAllToTop();
     setQuickTab('items');
   }
 }
@@ -1029,7 +1030,7 @@ function historyShift(dir){
   if(dir>0&&next>todayStr())return;
   historyDate=next;
   renderHistory();
-  window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
+  scrollAllToTop();
 }
 
 function renderHistory(){
@@ -1083,12 +1084,36 @@ function closeModalOutside(e,id){
   else if(id==='comboBg')closeComboModal();
 }
 
+// ── Scroll reset helper ───────────────────────────────
+function scrollAllToTop(){
+  window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  // inner scrollable containers in Menu panel
+  ['quickItemsView','quickCombosView'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.scrollTop=0;
+  });
+  // history panel itself
+  const hp=document.getElementById('historyPanel');
+  if(hp)hp.scrollTop=0;
+  // goals panel
+  const gp=document.getElementById('goalsPanel');
+  if(gp)gp.scrollTop=0;
+  // manage panel
+  const mp=document.getElementById('managePanel');
+  if(mp)mp.scrollTop=0;
+  // app panel
+  const ap=document.getElementById('app');
+  if(ap)ap.scrollTop=0;
+}
+
 // ── Tabs ──────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
     currentTab=t.dataset.tab;
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
-    window.scrollTo(0,0);closeSpeedDial();
+    scrollAllToTop();closeSpeedDial();
     document.getElementById('app').style.display='';
     document.getElementById('historyPanel').style.display='none';
     document.getElementById('historyFab').classList.remove('active');
@@ -1148,7 +1173,7 @@ function toggleGoals(){
     panel.style.display='';document.getElementById('app').style.display='none';
     fab.classList.add('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
+    scrollAllToTop();
     initGoalsUI();
   }
 }
@@ -1167,7 +1192,7 @@ function closeHistory(){
 }
 
 function openHistory(){
-  window.scrollTo(0,0);
+  scrollAllToTop();
   document.getElementById('goalsPanel').style.display='none';document.getElementById('goalsFab').classList.remove('active');
   document.getElementById('managePanel').style.display='none';document.getElementById('manageFab').classList.remove('active');
   document.getElementById('historyPanel').style.display='';
