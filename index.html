@@ -538,10 +538,10 @@
     </div>
     <div id="servingPreviewLabel" style="display:none;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Adjusted Amounts</div>
     <div id="servingPreview" style="display:none;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--accent);letter-spacing:1px;background:#0a0a08;border:1px solid var(--accent);padding:8px 14px;margin-bottom:6px;text-align:center;"></div>
-    <div class="form-row" style="grid-template-columns:50% 25% 25%;">
+    <div class="form-row" style="grid-template-columns:40% 35% 25%;">
       <div><label>CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="300"></div>
       <div><label>PROTEIN (g)</label><input type="number" id="inputPro" placeholder="25"></div>
-      <div><label>SERVING (x)</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1"></div>
+      <div><label>AMOUNT (x)</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1"></div>
     </div>
     <div class="checkbox-row" id="saveNewRow">
       <input type="checkbox" id="saveItem">
@@ -763,6 +763,7 @@ function toggleManage(){
     app.style.display='none';
     fab.classList.add('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    window.scrollTo({top:0,behavior:'smooth'});
     editingSaved = true;
     renderManagePanel();
   }
@@ -1148,6 +1149,7 @@ document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
     currentTab=t.dataset.tab;
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+    window.scrollTo({top:0,behavior:'smooth'});
     // close all panels when switching main tabs
     closeSpeedDial();
     document.getElementById('app').style.display='';
@@ -1218,6 +1220,7 @@ function closeHistory(){
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
 }
 function openHistory(){
+  window.scrollTo({top:0,behavior:'smooth'});
   document.getElementById('goalsPanel').style.display='none';
   document.getElementById('goalsFab').classList.remove('active');
   document.getElementById('managePanel').style.display='none';
