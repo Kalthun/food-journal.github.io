@@ -25,6 +25,9 @@
     --btn-fg:    #12120f;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+  input[type=number] { -moz-appearance:textfield; }
   body { background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; min-height:100vh; max-width:480px; margin:0 auto; padding:0 0 120px; }
 
   /* ── Header ── */
@@ -323,10 +326,10 @@
       <div class="form-row full"><div><label id="inputNameLabel">ITEM NAME</label><input type="text" id="inputName" placeholder="Name"></div></div>
       <div id="servingPreviewLabel" style="display:none;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Adjusted Amounts</div>
       <div id="servingPreview" style="display:none;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;background:#0a0a08;border:1px solid var(--accent);padding:8px 14px;margin-bottom:6px;text-align:center;border-radius:8px;"></div>
-      <div class="form-row" style="grid-template-columns:40% 35% 25%;">
+      <div class="form-row" id="macroRow" style="grid-template-columns:2fr 2fr 1fr;">
         <div><label>CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="0" value="0"></div>
         <div><label>PROTEIN (g)</label><input type="number" id="inputPro" placeholder="0" value="0"></div>
-        <div><label>AMOUNT (x)</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1"></div>
+        <div><label>QTY</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1"></div>
       </div>
       <div class="checkbox-row" id="saveNewRow">
         <input type="checkbox" id="saveItem">
@@ -653,6 +656,17 @@ function setLogTab(tab){
   document.getElementById('saveNewRow').style.display=isCombo?'none':'';
   const nameLabel=document.getElementById('inputNameLabel');
   if(nameLabel)nameLabel.textContent=isCombo?'COMBO NAME':'ITEM NAME';
+  // lock name/cal/pro on combo tab
+  ['inputName','inputCal','inputPro'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.readOnly=isCombo;
+    el.style.opacity=isCombo?'0.45':'1';
+    el.style.cursor=isCombo?'default':'';
+    el.style.pointerEvents=isCombo?'none':'';
+  });
+  const macroRow=document.getElementById('macroRow');
+  if(macroRow)macroRow.classList.toggle('combo-mode',isCombo);
   updateServingPreview();
   renderSavedChips();
 }
@@ -895,8 +909,8 @@ function openComboModal(idx){
     return '<span class="saved-chip normal'+(checked?' combo-selected':'')+'" id="crow'+i+'" onclick="onComboChipClick('+i+')" style="'+(checked?'border-color:var(--combo-col);':'')+'">'
       +'<span class="chip-name">'+esc(s.name)+' <span style="color:var(--muted)">'+s.cal+' kcal</span>'+proStr+'</span>'
       +'<span id="cqty-wrap'+i+'" style="display:'+(checked?'flex':'none')+';align-items:center;gap:6px;flex-shrink:0;" onclick="event.stopPropagation()">'
-      +'<span style="font-size:10px;color:var(--muted);letter-spacing:1px;">AMOUNT (x)</span>'
-      +'<input class="combo-item-qty" type="number" id="cqty'+i+'" value="'+qty+'" min="0.25" step="0.25" oninput="updateComboSummary()" />'
+      +'<span style="font-size:10px;color:var(--muted);letter-spacing:1px;">QTY</span>'
+      +'<input class="combo-item-qty" type="number" id="cqty'+i+'" value="'+qty+'" min="0.25" step="0.25" oninput="updateComboSummary()" style="width:72px;" />'
       +'</span>'
       +'</span>';
   }).join('');
@@ -1006,7 +1020,7 @@ function setGoalMode(mode,silent){
     document.getElementById('weeklyDayFields').innerHTML=DAYS.map((d,i)=>`
       <div style="display:flex;align-items:center;gap:10px;">
         <span style="font-size:11px;color:var(--muted);width:36px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;">${d.slice(0,3)}</span>
-        <input type="number" id="weeklyDay${i}" placeholder="2000" value="${weekly[i]}" style="flex:1;background:#12120f;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;">
+        <input type="number" id="weeklyDay${i}" placeholder="2000" value="${weekly[i]}" style="flex:1;min-width:0;background:#12120f;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;">
       </div>`).join('');
   }
   if(!silent){window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;const g=DB.goals;g.mode=mode;DB.goals=g;render();}
@@ -1086,7 +1100,7 @@ function closeModalOutside(e,id){
 
 // ── Scroll reset helper ───────────────────────────────
 function scrollAllToTop(){
-  window.scrollTo(0,0);
+  window.scrollTo({top:0,left:0,behavior:'instant'});
   document.documentElement.scrollTop=0;
   document.body.scrollTop=0;
   // inner scrollable containers in Menu panel
@@ -1094,18 +1108,17 @@ function scrollAllToTop(){
     const el=document.getElementById(id);
     if(el)el.scrollTop=0;
   });
-  // history panel itself
-  const hp=document.getElementById('historyPanel');
-  if(hp)hp.scrollTop=0;
-  // goals panel
-  const gp=document.getElementById('goalsPanel');
-  if(gp)gp.scrollTop=0;
-  // manage panel
-  const mp=document.getElementById('managePanel');
-  if(mp)mp.scrollTop=0;
-  // app panel
-  const ap=document.getElementById('app');
-  if(ap)ap.scrollTop=0;
+  // all main panels
+  ['historyPanel','goalsPanel','managePanel','app'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.scrollTop=0;
+  });
+  // belt-and-suspenders: defer a second reset in case layout shifts after display change
+  requestAnimationFrame(()=>{
+    window.scrollTo({top:0,left:0,behavior:'instant'});
+    document.documentElement.scrollTop=0;
+    document.body.scrollTop=0;
+  });
 }
 
 // ── Tabs ──────────────────────────────────────────────
