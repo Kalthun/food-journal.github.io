@@ -1200,6 +1200,7 @@ function toggleGoals(){
     app.style.display='none';
     fab.classList.add('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    window.scrollTo({top:0,behavior:'smooth'});
     initGoalsUI();
   }
 }
