@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Food Journal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=Outfit:wght@300;600;700&family=Lora:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;600;700&family=Lora:wght@600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:        #1D1C19;  /* dragonBlack2 */
@@ -136,14 +136,17 @@
   .entry-info  { text-align:right; flex-shrink:0; }
   .entry-cal   { font-size:13px; color:var(--accent); font-weight:500; }
   .entry-pro   { font-size:11px; color:var(--accent2); }
-  .entry-actions { display:flex; gap:2px; flex-shrink:0; }
+  .entry-actions { display:flex; gap:6px; flex-shrink:0; }
   .icon-btn {
-    background:none; border:none; cursor:pointer;
-    font-size:15px; padding:4px; line-height:1;
-    transition:color .15s; color:var(--muted);
+    background:none; border:1px solid var(--border); border-radius:8px; cursor:pointer;
+    font-size:17px; width:38px; height:38px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .15s;
   }
-  .icon-btn.edit:hover { color:var(--edit-col); }
-  .icon-btn.del:hover  { color:var(--danger); }
+  .icon-btn.edit { color:var(--edit-col); border-color:var(--edit-col); background:rgba(182,146,123,.1); }
+  .icon-btn.del  { color:var(--danger);   border-color:var(--danger);   background:rgba(196,116,110,.1); }
+  .icon-btn.edit:hover { background:rgba(182,146,123,.25); }
+  .icon-btn.del:hover  { background:rgba(196,116,110,.25); }
   .icon-btn:disabled   { opacity:.25; cursor:default; }
 
   .empty { text-align:center; color:var(--muted); font-size:12px; padding:40px 20px; letter-spacing:1px; }
@@ -164,7 +167,7 @@
     width:54px; height:54px;
     background:var(--surface2); color:var(--text);
     border:1px solid var(--border); border-radius:50%; cursor:pointer;
-    box-shadow:0 4px 16px rgba(0,0,0,.3);
+    box-shadow:0 4px 20px rgba(0,0,0,.3);
     transition:transform .15s, background .15s; z-index:201;
     display:flex; align-items:center; justify-content:center;
     flex-shrink:0;
@@ -184,7 +187,7 @@
     opacity:0; pointer-events:none;
   }
   .speed-dial-items.open {
-    max-height:200px; opacity:1; pointer-events:auto;
+    max-height:320px; opacity:1; pointer-events:auto;
   }
   .speed-dial-item {
     display:flex; align-items:center; gap:10px;
@@ -192,9 +195,9 @@
   .speed-dial-label {
     font-family:'DM Mono',monospace; font-size:11px;
     letter-spacing:1px; text-transform:uppercase;
-    color:var(--muted); background:var(--surface);
-    border:1px solid var(--border); border-radius:6px;
-    padding:4px 8px; white-space:nowrap;
+    color:var(--text); background:var(--surface2);
+    border:1px solid var(--accent); border-radius:6px;
+    padding:5px 10px; white-space:nowrap;
   }
 
   /* ── Toast ── */
@@ -213,25 +216,38 @@
   /* ── Modals ── */
   .modal-bg {
     display:none; position:fixed; inset:0;
-    background:rgba(0,0,0,.8); z-index:300; align-items:flex-end;
+    background:rgba(0,0,0,.85); z-index:300; align-items:center; justify-content:center;
   }
   .modal-bg.open { display:flex; }
   .modal {
-    background:var(--surface); border-top:1px solid var(--border);
-    border-radius:20px 20px 0 0; padding:22px 20px 40px; width:100%;
-    max-height:90vh; overflow-y:auto; animation:slideUp .25s ease;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:22px 20px 24px; width:calc(100% - 32px); max-width:480px;
+    height:calc(100vh - 48px); max-height:700px;
+    display:flex; flex-direction:column;
+    animation:popIn .2s ease;
+    overflow:hidden;
   }
-  @keyframes slideUp {
-    from { transform:translateY(100%); }
-    to   { transform:translateY(0); }
+  @keyframes popIn {
+    from { transform:scale(.95); opacity:0; }
+    to   { transform:scale(1);   opacity:1; }
   }
-  .modal h2 { font-family:'Syne',sans-serif; font-size:19px; font-weight:800; margin-bottom:18px; }
+  .modal h2 { font-family:'DM Mono', monospace; font-size:18px; font-weight:500; font-style:normal; margin-bottom:14px; flex-shrink:0; text-align:center; letter-spacing:1px; }
+  /* log modal specific layout */
+  #logModalBg .modal #savedListWrap {
+    flex:0 0 50%; min-height:0; display:flex; flex-direction:column; overflow:hidden;
+  }
+  #logModalBg .modal #savedListWrap .saved-list {
+    flex:1; overflow-y:auto; max-height:none; margin-bottom:8px;
+  }
+  #logModalBg .modal .log-form-section {
+    flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-end;
+  }
 
   /* ── Saved chips ── */
   .saved-mgmt { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
   .saved-list {
     display:flex; flex-direction:column; gap:6px;
-    margin-bottom:14px; max-height:200px; overflow-y:auto;
+    margin-bottom:14px; max-height:calc(100vh - 320px); overflow-y:auto;
   }
   .saved-chip {
     background:var(--surface2); border:1px solid var(--border);
@@ -248,15 +264,16 @@
   }
   .saved-chip .chip-name { flex:1; }
   .chip-edit-btn, .chip-del-btn {
-    background:none; border:none; cursor:pointer;
-    font-size:16px; padding:2px 4px; line-height:1;
-    transition:color .15s; flex-shrink:0;
-    border-radius:6px;
+    background:none; border:1px solid var(--border); cursor:pointer;
+    font-size:17px; width:38px; height:38px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .15s; flex-shrink:0;
+    border-radius:8px;
   }
-  .chip-edit-btn { color:var(--edit-col); }
-  .chip-del-btn  { color:var(--danger); }
-  .chip-edit-btn:hover { background:rgba(182,146,123,.15); }
-  .chip-del-btn:hover  { background:rgba(196,116,110,.15); }
+  .chip-edit-btn { color:var(--edit-col); border-color:var(--edit-col); background:rgba(182,146,123,.1); }
+  .chip-del-btn  { color:var(--danger);   border-color:var(--danger);   background:rgba(196,116,110,.1); }
+  .chip-edit-btn:hover { background:rgba(182,146,123,.25); }
+  .chip-del-btn:hover  { background:rgba(196,116,110,.25); }
   /* manage mode header styling */
   .saved-mgmt.managing {
     background:var(--bg); border-radius:8px;
@@ -310,14 +327,9 @@
   .new-item-btn:active { background:var(--streak); color:var(--btn-fg); }
 
   /* ── Goals ── */
-  .goals-section { padding:0 20px; margin-top:4px; }
   .goals-card {
     background:var(--surface); border:1px solid var(--border);
     border-radius:12px; padding:16px;
-  }
-  .goals-card h3 {
-    font-family:'Syne',sans-serif; font-size:13px; margin-bottom:12px;
-    color:var(--muted); text-transform:uppercase; letter-spacing:1px;
   }
 </style>
 </head>
@@ -369,7 +381,7 @@
     <div class="progress-wrap">
       <div class="progress-header"><span>CALORIES</span><span id="calGoalLabel">/ 2000 kcal</span></div>
       <div class="bar-track"><div class="bar-fill cal" id="calBar" style="width:0%"></div></div>
-      <div class="progress-header"><span>PROTEIN</span><span id="proGoalLabel">/ 150g</span></div>
+      <div class="progress-header"><span>PROTEIN</span><span id="proGoalLabel">/ 150 g</span></div>
       <div class="bar-track"><div class="bar-fill pro" id="proBar" style="width:0%"></div></div>
     </div>
   </div>
@@ -415,7 +427,8 @@
   </div>
 </div>
 
-<div id="goalsPanel" style="display:none;padding:0 20px 40px;">
+<div id="goalsPanel"
+ style="display:none;padding:0 20px 40px;">
   <div class="panel-header">Goals</div>
   <div class="goals-card">
     <!-- Mode toggle -->
@@ -457,9 +470,9 @@
 <div class="speed-dial" id="speedDial">
   <!-- Sub buttons (hidden by default, expand upward) -->
   <div class="speed-dial-items" id="speedDialItems">
-    <div class="speed-dial-item">
+<div class="speed-dial-item">
       <button class="fab-history" id="manageFab" onclick="toggleManage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="8" y="2" width="8" height="3" rx="1.5"/>
           <rect x="4" y="4" width="16" height="18" rx="2"/>
           <circle cx="12" cy="4" r="1"/>
@@ -475,7 +488,7 @@
     </div>
     <div class="speed-dial-item">
       <button class="fab-history" id="historyFab" onclick="toggleHistory()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74"/>
           <polyline points="3 3 3 8 8 8"/>
           <polyline points="12 7 12 12 15 15"/>
@@ -485,7 +498,7 @@
     </div>
     <div class="speed-dial-item">
       <button class="fab-history" id="goalsFab" onclick="toggleGoals()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
           <line x1="4" y1="22" x2="4" y2="15"/>
         </svg>
@@ -495,7 +508,7 @@
   </div>
   <!-- Main trigger button -->
   <button class="fab-history" id="speedDialBtn" onclick="toggleSpeedDial()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="3" y1="6"  x2="21" y2="6"/>
       <line x1="3" y1="12" x2="21" y2="12"/>
       <line x1="3" y1="18" x2="21" y2="18"/>
@@ -517,14 +530,18 @@
       </div>
       <div class="saved-list" id="savedList"></div>
     </div>
+    <div class="log-form-section">
     <div class="divider" id="logDivider">— or enter manually —</div>
 
     <div class="form-row full">
       <div><label>FOOD NAME</label><input type="text" id="inputName" placeholder="e.g. Chicken breast"></div>
     </div>
-    <div class="form-row">
+    <div id="servingPreviewLabel" style="display:none;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Adjusted Amounts</div>
+    <div id="servingPreview" style="display:none;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--accent);letter-spacing:1px;background:#0a0a08;border:1px solid var(--accent);padding:8px 14px;margin-bottom:6px;text-align:center;"></div>
+    <div class="form-row" style="grid-template-columns:50% 25% 25%;">
       <div><label>CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="300"></div>
       <div><label>PROTEIN (g)</label><input type="number" id="inputPro" placeholder="25"></div>
+      <div><label>SERVING (x)</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1"></div>
     </div>
     <div class="checkbox-row" id="saveNewRow">
       <input type="checkbox" id="saveItem">
@@ -535,12 +552,13 @@
       <button class="btn btn-secondary" onclick="closeLogModal()">Cancel</button>
       <button class="btn btn-primary" id="logSubmitBtn" onclick="submitLogForm()">Add</button>
     </div>
+    </div>
   </div>
 </div>
 
 <!-- ══ CONFIRM DELETE MODAL ══ -->
 <div class="modal-bg" id="confirmDeleteBg" onclick="closeModalOutside(event,'confirmDeleteBg')">
-  <div class="modal" style="text-align:center;">
+  <div class="modal" style="text-align:center; height:auto; max-height:none; padding:28px 24px 24px;">
     <h2 style="color:var(--danger);margin-bottom:10px;">Delete?</h2>
     <p id="confirmDeleteMsg" style="font-size:13px;color:var(--muted);margin-bottom:4px;"></p>
     <div class="form-actions" style="margin-top:20px;">
@@ -550,7 +568,7 @@
   </div>
 </div>
 <div class="modal-bg" id="editSavedBg" onclick="closeModalOutside(event,'editSavedBg')">
-  <div class="modal">
+  <div class="modal" style="height:auto;max-height:none;padding:28px 24px 24px;">
     <h2 id="editSavedTitle" style="color:var(--edit-col)">Edit Saved Item</h2>
     <div class="form-row full">
       <div><label>FOOD NAME</label><input type="text" id="editSavedName" placeholder="Name"></div>
@@ -654,7 +672,7 @@ function render(){
   document.getElementById('calBar').style.width=Math.min(100,(totalCal/goalCal)*100)+'%';
   document.getElementById('proBar').style.width=Math.min(100,(totalPro/goalPro)*100)+'%';
   document.getElementById('calGoalLabel').textContent=`/ ${goalCal} kcal`;
-  document.getElementById('proGoalLabel').textContent=`/ ${goalPro}g`;
+  document.getElementById('proGoalLabel').textContent=`/ ${goalPro} g`;
 
   // Calories & Protein remaining
   const remCard    = document.getElementById('calRemCard');
@@ -666,7 +684,7 @@ function render(){
   remVal.textContent = calRem;
   if(calRem >= 0){
     remVal.style.color = calRem < goalCal * 0.15 ? 'var(--tab-act)' : 'var(--text)';
-    document.getElementById('calRemUnit').textContent = 'kcal left';
+    document.getElementById('calRemUnit').textContent = 'kcal';
     remCard.style.borderColor = 'var(--border)';
   } else {
     remVal.style.color = 'var(--danger)';
@@ -677,7 +695,7 @@ function render(){
   const proRem = (currentTab === 'day' ? goals.pro : goalPro) - totalPro;
   proRemVal.textContent = Math.max(0, proRem);
   proRemVal.style.color = proRem <= 0 ? 'var(--streak)' : proRem < goalPro * 0.15 ? 'var(--tab-act)' : 'var(--text)';
-  document.getElementById('proRemUnit').textContent = proRem <= 0 ? 'goal hit! 💪' : 'g left';
+  document.getElementById('proRemUnit').textContent = proRem <= 0 ? 'goal hit! 💪' : 'g';
   proRemCard.style.borderColor = proRem <= 0 ? 'var(--streak)' : 'var(--border)';
 
   const labels={day:"Today's Log",week:"This Week's Log"};
@@ -693,7 +711,7 @@ function render(){
       </div>
       <div class="entry-info">
         <div class="entry-cal">${e.cal} kcal</div>
-        <div class="entry-pro">${e.pro}g</div>
+        <div class="entry-pro">${e.pro} g</div>
       </div>
       <div class="entry-actions">
         <button class="icon-btn edit" title="Edit"   onclick="openEditLogModal(${e.ts})">✎</button>
@@ -719,7 +737,7 @@ function renderManagePanel(){
   const sorted = [...saved].map((s,i)=>({...s,origIdx:i})).sort((a,b)=>a.name.localeCompare(b.name));
   el.innerHTML = sorted.map(function(item){
     return '<span class="saved-chip managing">'
-      + '<span class="chip-name">'+esc(item.name)+' · '+item.cal+'kcal · '+item.pro+'g</span>'
+      + '<span class="chip-name">'+esc(item.name)+' · '+item.cal+' kcal · '+item.pro+' g</span>'
       + '<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+item.origIdx+')">✎</button>'
       + '<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+item.origIdx+')">×</button>'
       + '</span>';
@@ -730,7 +748,6 @@ function toggleManage(){
   closeSpeedDial();
   const panel  = document.getElementById('managePanel');
   const app    = document.getElementById('app');
-  const hPanel = document.getElementById('historyPanel');
   const gPanel = document.getElementById('goalsPanel');
   const fab    = document.getElementById('manageFab');
   const isOpen = panel.style.display !== 'none';
@@ -752,12 +769,25 @@ function toggleManage(){
 }
 
 function openAddModal(){
+  const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
+  if(!historyOpen){
+    document.getElementById('managePanel').style.display='none';
+    document.getElementById('manageFab').classList.remove('active');
+    document.getElementById('goalsPanel').style.display='none';
+    document.getElementById('goalsFab').classList.remove('active');
+    document.getElementById('app').style.display='';
+    currentTab='day';
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='day'));
+  }
+  closeSpeedDial();
   editingLogTs=null;
-  document.getElementById('logModalTitle').textContent='Log Food';
+  document.getElementById('logModalTitle').textContent='Log Food'; document.getElementById('logModalTitle').style.color=historyOpen?'var(--edit-col)':'var(--header-fg)';
   document.getElementById('logSubmitBtn').textContent='Add';
   document.getElementById('inputName').value='';
   document.getElementById('inputCal').value='';
   document.getElementById('inputPro').value='';
+  document.getElementById('inputServings').value='1';
+  document.getElementById('servingPreview').textContent=''; document.getElementById('servingPreview').style.display='none'; document.getElementById('servingPreviewLabel').style.display='none';
   document.getElementById('saveItem').checked=false;
   document.getElementById('savedListWrap').style.display='';
   document.getElementById('logDivider').style.display='';
@@ -771,28 +801,33 @@ function openAddModal(){
 function openEditLogModal(ts){
   const e=DB.entries.find(e=>e.ts===ts); if(!e) return;
   editingLogTs=ts;
-  document.getElementById('logModalTitle').textContent='Edit Entry';
+  document.getElementById('logModalTitle').textContent='Edit Entry'; document.getElementById('logModalTitle').style.color='var(--edit-col)';
   document.getElementById('logSubmitBtn').textContent='Save';
   document.getElementById('inputName').value=e.name;
-  document.getElementById('inputCal').value=e.cal;
-  document.getElementById('inputPro').value=e.pro;
+  document.getElementById('inputCal').value=e.baseCal!==undefined ? e.baseCal : e.cal;
+  document.getElementById('inputPro').value=e.basePro!==undefined ? e.basePro : e.pro;
   document.getElementById('savedListWrap').style.display='none';
   document.getElementById('logDivider').style.display='none';
   document.getElementById('saveNewRow').style.display='none';
+  document.getElementById('inputServings').value=e.servings!==undefined ? e.servings : '1';
+  updateServingPreview();
   openModal('logModalBg');
   setTimeout(()=>document.getElementById('inputName').focus(),120);
 }
 
 function submitLogForm(){
   const name=document.getElementById('inputName').value.trim();
-  const cal=parseInt(document.getElementById('inputCal').value)||0;
-  const pro=parseInt(document.getElementById('inputPro').value)||0;
+  const servings=parseFloat(document.getElementById('inputServings').value)||1;
+  const cal=Math.round((parseInt(document.getElementById('inputCal').value)||0)*servings);
+  const pro=Math.round((parseInt(document.getElementById('inputPro').value)||0)*servings);
   if(!name){ document.getElementById('inputName').focus(); return; }
 
+  const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
   if(editingLogTs!==null){
-    DB.entries=DB.entries.map(e=>e.ts===editingLogTs?{...e,name,cal,pro}:e);
+    const baseCal=parseInt(document.getElementById('inputCal').value)||0;
+    const basePro=parseInt(document.getElementById('inputPro').value)||0;
+    DB.entries=DB.entries.map(e=>e.ts===editingLogTs?{...e,name,cal,pro,baseCal,basePro,servings}:e);
   } else {
-    const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
     const entryDate = historyOpen ? historyDate : todayStr();
     let entryTs = Date.now();
     if(historyOpen && entryDate !== todayStr()){
@@ -800,7 +835,7 @@ function submitLogForm(){
       const d = new Date(entryDate + 'T23:59:00');
       entryTs = d.getTime();
     }
-    DB.entries=[{name,cal,pro,date:entryDate,ts:entryTs},...DB.entries];
+    DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,date:entryDate,ts:entryTs},...DB.entries];
     if(document.getElementById('saveItem').checked){
       const saved=DB.saved;
       if(!saved.find(s=>s.name.toLowerCase()===name.toLowerCase()))
@@ -816,7 +851,6 @@ function submitLogForm(){
     }
   }
   closeLogModal();
-  const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
   if(historyOpen) renderHistory(); else render();
 }
 
@@ -825,7 +859,31 @@ function closeLogModal(){
   editingLogTs=null; editingSaved=false;
   document.getElementById('newSavedBtn').style.display='none';
   document.getElementById('savedMgmt').classList.remove('managing');
+  document.getElementById('inputServings').value='1';
+  document.getElementById('servingPreview').textContent=''; document.getElementById('servingPreview').style.display='none'; document.getElementById('servingPreviewLabel').style.display='none';
 }
+
+function updateServingPreview(){
+  const servings = parseFloat(document.getElementById('inputServings').value)||1;
+  const cal = parseInt(document.getElementById('inputCal').value)||0;
+  const pro = parseInt(document.getElementById('inputPro').value)||0;
+  const el = document.getElementById('servingPreview');
+  if(servings !== 1 && (cal||pro)){
+    const totalCal = Math.round(cal*servings);
+    const totalPro = Math.round(pro*servings);
+    el.innerHTML = '' + '<span style="color:var(--accent)">' + servings + '</span>' + '<span style="color:var(--text)"> x [</span>' + '<span style="color:var(--header-fg)">' + cal + '</span>' + '<span style="color:var(--text)">,</span>' + '<span style="color:var(--edit-col)">' + pro + '</span>' + '<span style="color:var(--text)">]  =  </span>' + '<span style="color:var(--header-fg)">' + totalCal + '</span>' + '<span style="color:var(--text)"> kcal | </span>' + '<span style="color:var(--edit-col)">' + totalPro + '</span>' + '<span style="color:var(--text)"> g</span>';
+    el.style.display = '';
+    el.style.textAlign = 'center';
+    document.getElementById('servingPreviewLabel').style.display = '';
+  } else {
+    el.textContent = '';
+    el.style.display = 'none';
+    document.getElementById('servingPreviewLabel').style.display = 'none';
+  }
+}
+['inputServings','inputCal','inputPro'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updateServingPreview);
+});
 
 // ── Saved Items ───────────────────────────────────────
 function renderSavedChips(){
@@ -850,24 +908,18 @@ function renderSavedChips(){
     const clickAttr = editingSaved ? '' : 'onclick="quickAdd('+origIdx+')"';
     const overLimit = !editingSaved && cal > calLeft;
     const chipClass = editingSaved ? 'saved-chip managing' : 'saved-chip normal' + (overLimit ? ' over-limit' : '');
-    const proStr = pro > 0 ? ' · <span style="color:var(--accent2)">'+pro+'g</span>' : '';
+    const proStr = pro > 0 ? ' · <span style="color:var(--accent2)">'+pro+' g</span>' : '';
     return '<span class="'+chipClass+'" '+clickAttr+'>'
-      + '<span class="chip-name">'+esc(name)+' <span style="color:var(--muted)">'+cal+'kcal</span>'+proStr+'</span>'
+      + '<span class="chip-name">'+esc(name)+' <span style="color:var(--muted)">'+cal+' kcal</span>'+proStr+'</span>'
       + editBtns
       + '</span>';
   }).join('');
-}
-function toggleSavedEdit(){
-  editingSaved=!editingSaved;
-  document.getElementById('newSavedBtn').style.display = editingSaved ? '' : 'none';
-  document.getElementById('savedMgmt').classList.toggle('managing', editingSaved);
-  renderSavedChips();
 }
 
 function openNewSavedModal(){
   editingSavedIdx = null; // null = new item
   document.getElementById('editSavedTitle').textContent = 'New Saved Item';
-  document.getElementById('editSavedTitle').style.color = 'var(--streak)';
+  document.getElementById('editSavedTitle').style.color = 'var(--edit-col)';
   document.getElementById('editSavedName').value = '';
   document.getElementById('editSavedCal').value  = '';
   document.getElementById('editSavedPro').value  = '';
@@ -889,6 +941,8 @@ function quickAdd(i){
   document.getElementById('inputName').value=s.name;
   document.getElementById('inputCal').value=s.cal;
   document.getElementById('inputPro').value=s.pro;
+  document.getElementById('inputServings').value='1';
+  updateServingPreview();
 }
 
 // ── Edit Saved Modal ──────────────────────────────────
@@ -911,10 +965,19 @@ function saveEditedSaved(){
   if(!name){ document.getElementById('editSavedName').focus(); return; }
   const saved=DB.saved;
   if(editingSavedIdx===null){
-    // New item
+    // New item — check for duplicate
+    if(saved.find(s=>s.name.toLowerCase()===name.toLowerCase())){
+      showToast('"'+name+'" is already in quick-add');
+      return;
+    }
     saved.push({name,cal,pro});
   } else {
-    // Edit existing
+    // Edit existing — check for duplicate excluding current item
+    const duplicate = saved.find((s,i)=>i!==editingSavedIdx && s.name.toLowerCase()===name.toLowerCase());
+    if(duplicate){
+      showToast('"'+name+'" is already in quick-add');
+      return;
+    }
     saved[editingSavedIdx]={name,cal,pro};
   }
   DB.saved=saved;
@@ -926,17 +989,14 @@ function saveEditedSaved(){
 function closeEditSavedModal(){ closeModal('editSavedBg'); editingSavedIdx=null; }
 
 // ── Toast ─────────────────────────────────────────────
-let _toastTimeout = null;
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  if(_toastTimeout) clearTimeout(_toastTimeout);
   document.addEventListener('click', hideToast, {once:true, capture:true});
 }
 function hideToast(){
   document.getElementById('toast').classList.remove('show');
-  if(_toastTimeout){ clearTimeout(_toastTimeout); _toastTimeout=null; }
 }
 
 // ── Goals ─────────────────────────────────────────────
@@ -1039,7 +1099,7 @@ function renderHistory(){
       </div>
       <div class="entry-info">
         <div class="entry-cal">${e.cal} kcal</div>
-        <div class="entry-pro">${e.pro}g</div>
+        <div class="entry-pro">${e.pro} g</div>
       </div>
       <div class="entry-actions">
         <button class="icon-btn edit" title="Edit"   onclick="openEditLogModal(${e.ts})">✎</button>
@@ -1188,7 +1248,6 @@ document.addEventListener('keydown',e=>{
 });
 
 // ── Init ──────────────────────────────────────────────
-document.querySelector('header h1').textContent = "Food Journal";
 document.getElementById('headerDate').textContent =
   new Date().toLocaleDateString('en-US', {timeZone: TZ, weekday:'long', month:'long', day:'numeric'}).toUpperCase();
 render();
