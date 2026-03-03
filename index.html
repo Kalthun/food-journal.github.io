@@ -8,21 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;600;700&family=Lora:wght@600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:        #1D1C19;  /* dragonBlack2 */
-    --surface:   #282727;  /* dragonBlack4 */
-    --surface2:  #393836;  /* dragonBlack5 */
-    --border:    #393836;  /* dragonBlack5 */
-    --text:      #c5c9c5;  /* dragonWhite  */
-    --muted:     #7a8382;  /* dragonGray3  */
-    --accent:    #8ea4a2;  /* dragonAqua   — calories */
-    --accent2:   #8ba4b0;  /* dragonBlue2  — protein  */
-    --header-fg: #8992a7;  /* dragonViolet */
-    --tab-act:   #c4b28a;  /* dragonYellow */
-    --streak:    #87a987;  /* dragonGreen  */
-    --chip-hov:  #87a987;  /* dragonGreen  */
-    --danger:    #c4746e;  /* dragonRed    */
-    --edit-col:  #b6927b;  /* dragonOrange */
-    --btn-fg:    #12120f;  /* dragonBlack1 */
+    --bg:        #1D1C19;
+    --surface:   #282727;
+    --surface2:  #393836;
+    --border:    #393836;
+    --text:      #c5c9c5;
+    --muted:     #7a8382;
+    --accent:    #8ea4a2;
+    --accent2:   #8ba4b0;
+    --header-fg: #8992a7;
+    --tab-act:   #c4b28a;
+    --streak:    #87a987;
+    --chip-hov:  #87a987;
+    --danger:    #c4746e;
+    --edit-col:  #b6927b;
+    --btn-fg:    #12120f;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -163,36 +163,90 @@
   }
   .fab:active { transform:scale(.93); }
   .fab.history-mode { background:var(--edit-col); box-shadow:0 4px 20px rgba(182,146,123,.4); }
-  .fab-history {
-    width:54px; height:54px;
-    background:var(--surface2); color:var(--text);
-    border:1px solid var(--border); border-radius:50%; cursor:pointer;
-    box-shadow:0 4px 20px rgba(0,0,0,.3);
-    transition:transform .15s, background .15s; z-index:201;
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
-  }
-  .fab-history:active { transform:scale(.93); }
-  .fab-history.active { background:var(--accent); color:var(--btn-fg); border-color:var(--accent); }
 
+  /* ── Speed Dial ── */
   .speed-dial {
-    position:fixed; bottom:28px; left:20px; z-index:200;
+    position: fixed;
+    bottom: 28px;
+    left: 20px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
   }
-  .speed-dial-trigger { display:flex; }
+
+  /* The popup options panel — sits above trigger, no background on trigger itself */
   .speed-dial-panel {
-    display:none; flex-direction:column; gap:8px;
-    background:var(--surface2); border:1px solid var(--border);
-    border-radius:20px; padding:12px;
-    box-shadow:0 4px 24px rgba(0,0,0,.4);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.5);
+    animation: dialIn .18s ease;
   }
-  .speed-dial-panel.open { display:flex; }
-  .speed-dial-item { display:flex; flex-direction:row; align-items:center; gap:10px; }
-  .speed-dial-label {
-    font-family:'DM Mono',monospace; font-size:11px;
-    letter-spacing:1.5px; text-transform:uppercase;
-    color:var(--text); white-space:nowrap;
+  .speed-dial-panel.open { display: flex; }
+  @keyframes dialIn {
+    from { opacity:0; transform:translateY(8px) scale(.97); }
+    to   { opacity:1; transform:translateY(0) scale(1); }
   }
-  .speed-dial-divider { height:1px; background:var(--border); margin:2px 0; }
+
+  /* Each row: circle icon + pill label */
+  .speed-dial-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Circle icon button */
+  .sd-icon-btn {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background .15s, border-color .15s;
+  }
+  .sd-icon-btn:active { transform: scale(.93); }
+  .sd-icon-btn.active { background: var(--accent); color: var(--btn-fg); border-color: var(--accent); }
+
+  /* Pill label */
+  .sd-label {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 7px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .sd-label:hover { border-color: var(--muted); color: var(--text); }
+
+  /* Trigger button — standalone, no panel background */
+  .sd-trigger-btn {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    transition: background .15s, border-color .15s;
+  }
+  .sd-trigger-btn:active { transform: scale(.93); }
+  .sd-trigger-btn.active { background: var(--accent); color: var(--btn-fg); border-color: var(--accent); }
 
   /* ── Toast ── */
   .toast {
@@ -221,12 +275,15 @@
     animation:popIn .2s ease;
     overflow:hidden;
   }
+  .modal.auto-height {
+    height:auto; max-height:calc(100vh - 48px);
+    overflow:auto;
+  }
   @keyframes popIn {
     from { transform:scale(.95); opacity:0; }
     to   { transform:scale(1);   opacity:1; }
   }
   .modal h2 { font-family:'DM Mono', monospace; font-size:18px; font-weight:500; font-style:normal; margin-bottom:14px; flex-shrink:0; text-align:center; letter-spacing:1px; }
-  /* log modal specific layout */
   #logModalBg .modal #savedListWrap {
     flex:0 0 50%; min-height:0; display:flex; flex-direction:column; overflow:hidden;
   }
@@ -252,27 +309,18 @@
   .saved-chip.normal:hover { border-color:var(--chip-hov); color:var(--chip-hov); }
   .saved-chip.over-limit { border-color:var(--danger) !important; color:var(--danger); }
   .saved-chip.over-limit:hover { border-color:var(--danger); opacity:.8; }
-  .saved-chip.managing {
-    background:var(--bg); border-color:var(--surface2);
-    cursor:default;
-  }
+  .saved-chip.managing { background:var(--bg); border-color:var(--surface2); cursor:default; }
   .saved-chip .chip-name { flex:1; }
   .chip-edit-btn, .chip-del-btn {
     background:none; border:1px solid var(--border); cursor:pointer;
     font-size:17px; width:38px; height:38px; line-height:1;
     display:flex; align-items:center; justify-content:center;
-    transition:all .15s; flex-shrink:0;
-    border-radius:8px;
+    transition:all .15s; flex-shrink:0; border-radius:8px;
   }
   .chip-edit-btn { color:var(--edit-col); border-color:var(--edit-col); background:rgba(182,146,123,.1); }
   .chip-del-btn  { color:var(--danger);   border-color:var(--danger);   background:rgba(196,116,110,.1); }
   .chip-edit-btn:hover { background:rgba(182,146,123,.25); }
   .chip-del-btn:hover  { background:rgba(196,116,110,.25); }
-  /* manage mode header styling */
-  .saved-mgmt.managing {
-    background:var(--bg); border-radius:8px;
-    padding:6px 10px; border:1px solid var(--border);
-  }
 
   .divider {
     text-align:center; font-size:10px; color:var(--muted);
@@ -409,7 +457,6 @@
   <div class="entries" id="historyEntries"></div>
 </div>
 
-<!-- ══ GOALS PANEL ══ -->
 <!-- ══ MANAGE QUICK-ADD PANEL ══ -->
 <div id="managePanel" style="display:none;padding:0 20px 40px;">
   <div class="panel-header">Quick-Add</div>
@@ -421,11 +468,10 @@
   </div>
 </div>
 
-<div id="goalsPanel"
- style="display:none;padding:0 20px 40px;">
+<!-- ══ GOALS PANEL ══ -->
+<div id="goalsPanel" style="display:none;padding:0 20px 40px;">
   <div class="panel-header">Goals</div>
   <div class="goals-card">
-    <!-- Mode toggle -->
     <div style="display:flex;gap:0;margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
       <button id="goalModeDaily" onclick="setGoalMode('daily')"
         style="flex:1;padding:9px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;border:none;cursor:pointer;transition:all .2s;background:var(--header-fg);color:var(--btn-fg);">
@@ -436,14 +482,12 @@
         Weekly
       </button>
     </div>
-    <!-- Daily fields -->
     <div id="goalFieldsDaily">
       <div class="form-row">
         <div><label>CALORIE GOAL (kcal)</label><input type="number" id="goalCal" placeholder="2000"></div>
         <div><label>PROTEIN GOAL (g)</label><input type="number" id="goalPro" placeholder="150"></div>
       </div>
     </div>
-    <!-- Weekly fields -->
     <div id="goalFieldsWeekly" style="display:none;">
       <div style="font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">CALORIE GOAL <span style="text-transform:lowercase;">(kcal)</span></div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;" id="weeklyDayFields"></div>
@@ -458,55 +502,49 @@
   </div>
 </div>
 
+<!-- ══ FAB ══ -->
 <button class="fab" id="addFab" onclick="openAddModal()">+</button>
 
 <!-- ══ SPEED DIAL ══ -->
 <div class="speed-dial" id="speedDial">
-  <div class="speed-dial-trigger" id="speedDialTrigger">
-    <button class="fab-history" id="speedDialBtn" onclick="toggleSpeedDial()">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-      </svg>
-    </button>
-  </div>
-  <div class="speed-dial-panel" id="speedDialItems">
+  <!-- Popup options panel (no trigger button inside) -->
+  <div class="speed-dial-panel" id="speedDialPanel">
     <div class="speed-dial-item">
-      <button class="fab-history" id="manageFab" onclick="toggleManage()">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="sd-icon-btn" id="manageFab" title="Quick-Add" onclick="toggleManage()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="8" y="2" width="8" height="3" rx="1.5"/><rect x="4" y="4" width="16" height="18" rx="2"/>
           <circle cx="12" cy="4" r="1"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="16" x2="16" y2="16"/>
           <circle cx="6.5" cy="10" r="1" fill="currentColor"/><circle cx="6.5" cy="13" r="1" fill="currentColor"/><circle cx="6.5" cy="16" r="1" fill="currentColor"/>
         </svg>
       </button>
-      <span class="speed-dial-label">Quick-Add</span>
+      <span class="sd-label" onclick="toggleManage()">Quick-Add</span>
     </div>
     <div class="speed-dial-item">
-      <button class="fab-history" id="historyFab" onclick="toggleHistory()">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="sd-icon-btn" id="historyFab" title="History" onclick="toggleHistory()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74"/>
           <polyline points="3 3 3 8 8 8"/><polyline points="12 7 12 12 15 15"/>
         </svg>
       </button>
-      <span class="speed-dial-label">History</span>
+      <span class="sd-label" onclick="toggleHistory()">History</span>
     </div>
     <div class="speed-dial-item">
-      <button class="fab-history" id="goalsFab" onclick="toggleGoals()">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="sd-icon-btn" id="goalsFab" title="Goals" onclick="toggleGoals()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
           <line x1="4" y1="22" x2="4" y2="15"/>
         </svg>
       </button>
-      <span class="speed-dial-label">Goals</span>
-    </div>
-    <div class="speed-dial-divider"></div>
-    <div class="speed-dial-item">
-      <button class="fab-history" id="speedDialBtnInner" onclick="toggleSpeedDial()">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
+      <span class="sd-label" onclick="toggleGoals()">Goals</span>
     </div>
   </div>
+
+  <!-- Standalone trigger — outside the panel -->
+  <button class="sd-trigger-btn" id="speedDialBtn" onclick="toggleSpeedDial()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
 </div>
 
 <div id="toast" class="toast" onclick="hideToast()"></div>
@@ -515,7 +553,6 @@
 <div class="modal-bg" id="logModalBg" onclick="closeModalOutside(event,'logModalBg')">
   <div class="modal">
     <h2 id="logModalTitle">Log Food</h2>
-
     <div id="savedListWrap">
       <div class="saved-mgmt" id="savedMgmt">
         <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Quick-Add</span>
@@ -524,34 +561,32 @@
       <div class="saved-list" id="savedList"></div>
     </div>
     <div class="log-form-section">
-    <div class="divider" id="logDivider">— or enter manually —</div>
-
-    <div class="form-row full">
-      <div><label>FOOD NAME</label><input type="text" id="inputName" placeholder="e.g. Chicken breast"></div>
-    </div>
-    <div id="servingPreviewLabel" style="display:none;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Adjusted Amounts</div>
-    <div id="servingPreview" style="display:none;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--accent);letter-spacing:1px;background:#0a0a08;border:1px solid var(--accent);padding:8px 14px;margin-bottom:6px;text-align:center;"></div>
-    <div class="form-row" style="grid-template-columns:40% 35% 25%;">
-      <div><label>CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="300"></div>
-      <div><label>PROTEIN (g)</label><input type="number" id="inputPro" placeholder="25"></div>
-      <div><label>AMOUNT (x)</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1"></div>
-    </div>
-    <div class="checkbox-row" id="saveNewRow">
-      <input type="checkbox" id="saveItem">
-      <label for="saveItem">Save as quick-add item</label>
-    </div>
-
-    <div class="form-actions">
-      <button class="btn btn-secondary" onclick="closeLogModal()">Cancel</button>
-      <button class="btn btn-primary" id="logSubmitBtn" onclick="submitLogForm()">Add</button>
-    </div>
+      <div class="divider" id="logDivider">— or enter manually —</div>
+      <div class="form-row full">
+        <div><label>FOOD NAME</label><input type="text" id="inputName" placeholder="e.g. Chicken breast"></div>
+      </div>
+      <div id="servingPreviewLabel" style="display:none;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Adjusted Amounts</div>
+      <div id="servingPreview" style="display:none;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--accent);letter-spacing:1px;background:#0a0a08;border:1px solid var(--accent);padding:8px 14px;margin-bottom:6px;text-align:center;"></div>
+      <div class="form-row" style="grid-template-columns:40% 35% 25%;">
+        <div><label>CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="300"></div>
+        <div><label>PROTEIN (g)</label><input type="number" id="inputPro" placeholder="25"></div>
+        <div><label>AMOUNT (x)</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1"></div>
+      </div>
+      <div class="checkbox-row" id="saveNewRow">
+        <input type="checkbox" id="saveItem">
+        <label for="saveItem">Save as quick-add item</label>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeLogModal()">Cancel</button>
+        <button class="btn btn-primary" id="logSubmitBtn" onclick="submitLogForm()">Add</button>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- ══ CONFIRM DELETE MODAL ══ -->
 <div class="modal-bg" id="confirmDeleteBg" onclick="closeModalOutside(event,'confirmDeleteBg')">
-  <div class="modal" style="text-align:center; height:auto; max-height:none; padding:28px 24px 24px;">
+  <div class="modal auto-height" style="text-align:center; padding:28px 24px 24px;">
     <h2 style="color:var(--danger);margin-bottom:10px;">Delete?</h2>
     <p id="confirmDeleteMsg" style="font-size:13px;color:var(--muted);margin-bottom:4px;"></p>
     <div class="form-actions" style="margin-top:20px;">
@@ -560,8 +595,10 @@
     </div>
   </div>
 </div>
+
+<!-- ══ EDIT SAVED MODAL ══ -->
 <div class="modal-bg" id="editSavedBg" onclick="closeModalOutside(event,'editSavedBg')">
-  <div class="modal" style="height:auto;max-height:none;padding:28px 24px 24px;">
+  <div class="modal auto-height" style="padding:28px 24px 24px;">
     <h2 id="editSavedTitle" style="color:var(--edit-col)">Edit Saved Item</h2>
     <div class="form-row full">
       <div><label>FOOD NAME</label><input type="text" id="editSavedName" placeholder="Name"></div>
@@ -588,17 +625,15 @@ const DB = {
   set goals(v) { localStorage.setItem('fl_goals',JSON.stringify(v)) },
 };
 
-// ── State ────────────────────────────────────────────
-let currentTab     = 'day';
-let editingSaved   = false;
-let editingLogTs   = null;  // ts of log entry being edited; null = new
-let editingSavedIdx = null; // index of saved item being edited
+let currentTab      = 'day';
+let editingSaved    = false;
+let editingLogTs    = null;
+let editingSavedIdx = null;
 
-// ── Helpers ──────────────────────────────────────────
-const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone; // device local timezone
-const todayStr = () => new Date().toLocaleDateString('en-CA', {timeZone: TZ});
-const localDateStr = (d) => d.toLocaleDateString('en-CA', {timeZone: TZ});
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const todayStr    = () => new Date().toLocaleDateString('en-CA', {timeZone: TZ});
+const localDateStr = d  => d.toLocaleDateString('en-CA', {timeZone: TZ});
+const esc    = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const fmtTime = ts => new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
 function getDateRange(tab){
@@ -606,14 +641,13 @@ function getDateRange(tab){
   if(tab==='day'){ const s=todayStr(); return{start:s,end:s}; }
   const d=new Date(now);
   const dayOfWeek = d.getDay();
-  const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
-  d.setDate(d.getDate() + diffToMon);
+  const diffToMon = (dayOfWeek===0) ? -6 : 1-dayOfWeek;
+  d.setDate(d.getDate()+diffToMon);
   const start=localDateStr(d);
   const e=new Date(d); e.setDate(e.getDate()+6);
   return{start,end:localDateStr(e)};
 }
 
-// ── Streak ───────────────────────────────────────────
 function calcStreak(){
   const days=[...new Set(DB.entries.map(e=>e.date))].sort().reverse();
   if(!days.length) return 0;
@@ -622,7 +656,6 @@ function calcStreak(){
     const cur=localDateStr(cursor);
     if(day===cur){ streak++; cursor.setDate(cursor.getDate()-1); }
     else if(streak===0){
-      // today not yet logged — start counting from yesterday
       cursor.setDate(cursor.getDate()-1);
       if(day===localDateStr(cursor)){ streak++; cursor.setDate(cursor.getDate()-1); }
       else break;
@@ -631,7 +664,6 @@ function calcStreak(){
   return streak;
 }
 
-// ── Render ───────────────────────────────────────────
 function render(){
   const goals=DB.goals;
   document.getElementById('streakNum').textContent=calcStreak();
@@ -641,24 +673,21 @@ function render(){
   const totalCal=entries.reduce((s,e)=>s+(e.cal||0),0);
   const totalPro=entries.reduce((s,e)=>s+(e.pro||0),0);
 
-  // Compute goalCal based on mode
   let goalCal, goalPro;
-  const weekly = goals.weekly || [2000,2000,2000,2000,2000,2000,2000];
-  const weeklyTotal = weekly.reduce((s,v)=>s+v,0);
+  const weekly=goals.weekly||[2000,2000,2000,2000,2000,2000,2000];
+  const weeklyTotal=weekly.reduce((s,v)=>s+v,0);
   if(goals.mode==='weekly'){
     if(currentTab==='day'){
-      const dow = new Date().getDay();
-      const idx = dow===0 ? 6 : dow-1;
-      goalCal = weekly[idx];
-    } else {
-      goalCal = weeklyTotal;
-    }
+      const dow=new Date().getDay();
+      const idx=dow===0?6:dow-1;
+      goalCal=weekly[idx];
+    } else { goalCal=weeklyTotal; }
   } else {
-    const mult = currentTab==='week' ? 7 : 1;
-    goalCal = goals.cal * mult;
+    const mult=currentTab==='week'?7:1;
+    goalCal=goals.cal*mult;
   }
-  const proMult = currentTab==='week' ? 7 : 1;
-  goalPro = (goals.mode==='weekly' ? (goals.proWeekly||goals.pro) : goals.pro) * proMult;
+  const proMult=currentTab==='week'?7:1;
+  goalPro=(goals.mode==='weekly'?(goals.proWeekly||goals.pro):goals.pro)*proMult;
 
   document.getElementById('calVal').textContent=totalCal;
   document.getElementById('proVal').textContent=totalPro;
@@ -667,32 +696,30 @@ function render(){
   document.getElementById('calGoalLabel').textContent=`/ ${goalCal} kcal`;
   document.getElementById('proGoalLabel').textContent=`/ ${goalPro} g`;
 
-  // Calories & Protein remaining
-  const remCard    = document.getElementById('calRemCard');
-  const remVal     = document.getElementById('calRemVal');
-  const proRemCard = document.getElementById('proRemCard');
-  const proRemVal  = document.getElementById('proRemVal');
+  const remCard=document.getElementById('calRemCard');
+  const remVal=document.getElementById('calRemVal');
+  const proRemCard=document.getElementById('proRemCard');
+  const proRemVal=document.getElementById('proRemVal');
 
-  const calRem = (currentTab === 'day' ? goals.cal : goalCal) - totalCal;
-  remVal.textContent = calRem;
-  if(calRem >= 0){
-    remVal.style.color = calRem < goalCal * 0.15 ? 'var(--tab-act)' : 'var(--text)';
-    document.getElementById('calRemUnit').textContent = 'kcal';
-    remCard.style.borderColor = 'var(--border)';
+  const calRem=(currentTab==='day'?goals.cal:goalCal)-totalCal;
+  remVal.textContent=calRem;
+  if(calRem>=0){
+    remVal.style.color=calRem<goalCal*0.15?'var(--tab-act)':'var(--text)';
+    document.getElementById('calRemUnit').textContent='kcal';
+    remCard.style.borderColor='var(--border)';
   } else {
-    remVal.style.color = 'var(--danger)';
-    document.getElementById('calRemUnit').textContent = 'limit exceeded! ⚠️';
-    remCard.style.borderColor = 'var(--danger)';
+    remVal.style.color='var(--danger)';
+    document.getElementById('calRemUnit').textContent='limit exceeded! ⚠️';
+    remCard.style.borderColor='var(--danger)';
   }
 
-  const proRem = (currentTab === 'day' ? goals.pro : goalPro) - totalPro;
-  proRemVal.textContent = Math.max(0, proRem);
-  proRemVal.style.color = proRem <= 0 ? 'var(--streak)' : proRem < goalPro * 0.15 ? 'var(--tab-act)' : 'var(--text)';
-  document.getElementById('proRemUnit').textContent = proRem <= 0 ? 'goal hit! 💪' : 'g';
-  proRemCard.style.borderColor = proRem <= 0 ? 'var(--streak)' : 'var(--border)';
+  const proRem=(currentTab==='day'?goals.pro:goalPro)-totalPro;
+  proRemVal.textContent=Math.max(0,proRem);
+  proRemVal.style.color=proRem<=0?'var(--streak)':proRem<goalPro*0.15?'var(--tab-act)':'var(--text)';
+  document.getElementById('proRemUnit').textContent=proRem<=0?'goal hit! 💪':'g';
+  proRemCard.style.borderColor=proRem<=0?'var(--streak)':'var(--border)';
 
-  const labels={day:"Today's Log",week:"This Week's Log"};
-  document.getElementById('sectionLabel').textContent=labels[currentTab];
+  document.getElementById('sectionLabel').textContent=currentTab==='day'?"Today's Log":"This Week's Log";
 
   const el=document.getElementById('entries');
   if(!entries.length){ el.innerHTML='<div class="empty">NO ENTRIES YET</div>'; return; }
@@ -707,64 +734,57 @@ function render(){
         <div class="entry-pro">${e.pro} g</div>
       </div>
       <div class="entry-actions">
-        <button class="icon-btn edit" title="Edit"   onclick="openEditLogModal(${e.ts})">✎</button>
+        <button class="icon-btn edit" title="Edit" onclick="openEditLogModal(${e.ts})">✎</button>
         <button class="icon-btn del"  title="Delete" onclick="deleteEntry(${e.ts})">×</button>
       </div>
     </div>
   `).join('');
 }
 
-// ── Log Entry CRUD ────────────────────────────────────
 function deleteEntry(ts){
   const e=DB.entries.find(e=>e.ts===ts);
-  showConfirm('Remove "'+(e?e.name:'this entry')+'"?', ()=>{
+  showConfirm('Remove "'+(e?e.name:'this entry')+'"?',()=>{
     DB.entries=DB.entries.filter(e=>e.ts!==ts);
     render();
   });
 }
 
 function renderManagePanel(){
-  const saved = DB.saved;
-  const el = document.getElementById('managePanelList');
+  const saved=DB.saved;
+  const el=document.getElementById('managePanelList');
   if(!saved.length){ el.innerHTML='<div class="empty" style="padding:20px 0;">NO SAVED ITEMS YET</div>'; return; }
-  const sorted = [...saved].map((s,i)=>({...s,origIdx:i})).sort((a,b)=>a.name.localeCompare(b.name));
-  el.innerHTML = sorted.map(function(item){
-    return '<span class="saved-chip managing">'
-      + '<span class="chip-name">'+esc(item.name)+' · '+item.cal+' kcal · '+item.pro+' g</span>'
-      + '<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+item.origIdx+')">✎</button>'
-      + '<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+item.origIdx+')">×</button>'
-      + '</span>';
-  }).join('');
+  const sorted=[...saved].map((s,i)=>({...s,origIdx:i})).sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(item=>'<span class="saved-chip managing">'
+    +'<span class="chip-name">'+esc(item.name)+' · '+item.cal+' kcal · '+item.pro+' g</span>'
+    +'<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+item.origIdx+')">✎</button>'
+    +'<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+item.origIdx+')">×</button>'
+    +'</span>').join('');
 }
 
 function toggleManage(){
   closeSpeedDial();
-  const panel  = document.getElementById('managePanel');
-  const app    = document.getElementById('app');
-  const gPanel = document.getElementById('goalsPanel');
-  const fab    = document.getElementById('manageFab');
-  const isOpen = panel.style.display !== 'none';
+  const panel=document.getElementById('managePanel');
+  const app=document.getElementById('app');
+  const gPanel=document.getElementById('goalsPanel');
+  const fab=document.getElementById('manageFab');
+  const isOpen=panel.style.display!=='none';
   if(isOpen){
-    panel.style.display='none';
-    app.style.display='';
+    panel.style.display='none'; app.style.display='';
     fab.classList.remove('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
   } else {
     closeHistory();
     gPanel.style.display='none'; document.getElementById('goalsFab').classList.remove('active');
-    panel.style.display='';
-    app.style.display='none';
+    panel.style.display=''; app.style.display='none';
     fab.classList.add('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0;
-    editingSaved = true;
+    window.scrollTo(0,0); editingSaved=true;
     renderManagePanel();
-    setTimeout(()=>{ document.getElementById('managePanel').scrollTop=0; document.getElementById('managePanelList').scrollTop=0; },10);
   }
 }
 
 function openAddModal(){
-  const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
+  const historyOpen=document.getElementById('historyPanel').style.display!=='none';
   if(!historyOpen){
     document.getElementById('managePanel').style.display='none';
     document.getElementById('manageFab').classList.remove('active');
@@ -776,13 +796,16 @@ function openAddModal(){
   }
   closeSpeedDial();
   editingLogTs=null;
-  document.getElementById('logModalTitle').textContent='Log Food'; document.getElementById('logModalTitle').style.color=historyOpen?'var(--edit-col)':'var(--header-fg)';
+  document.getElementById('logModalTitle').textContent='Log Food';
+  document.getElementById('logModalTitle').style.color=historyOpen?'var(--edit-col)':'var(--header-fg)';
   document.getElementById('logSubmitBtn').textContent='Add';
   document.getElementById('inputName').value='';
   document.getElementById('inputCal').value='';
   document.getElementById('inputPro').value='';
   document.getElementById('inputServings').value='1';
-  document.getElementById('servingPreview').textContent=''; document.getElementById('servingPreview').style.display='none'; document.getElementById('servingPreviewLabel').style.display='none';
+  document.getElementById('servingPreview').textContent='';
+  document.getElementById('servingPreview').style.display='none';
+  document.getElementById('servingPreviewLabel').style.display='none';
   document.getElementById('saveItem').checked=false;
   document.getElementById('savedListWrap').style.display='';
   document.getElementById('logDivider').style.display='';
@@ -797,15 +820,17 @@ function openAddModal(){
 function openEditLogModal(ts){
   const e=DB.entries.find(e=>e.ts===ts); if(!e) return;
   editingLogTs=ts;
-  document.getElementById('logModalTitle').textContent='Edit Entry'; document.getElementById('logModalTitle').style.color='var(--edit-col)';
+  document.getElementById('logModalTitle').textContent='Edit Entry';
+  document.getElementById('logModalTitle').style.color='var(--edit-col)';
   document.getElementById('logSubmitBtn').textContent='Save';
   document.getElementById('inputName').value=e.name;
-  document.getElementById('inputCal').value=e.baseCal!==undefined ? e.baseCal : e.cal;
-  document.getElementById('inputPro').value=e.basePro!==undefined ? e.basePro : e.pro;
+  document.getElementById('inputCal').value=e.baseCal!==undefined?e.baseCal:e.cal;
+  document.getElementById('inputPro').value=e.basePro!==undefined?e.basePro:e.pro;
   document.getElementById('savedListWrap').style.display='none';
   document.getElementById('logDivider').style.display='none';
   document.getElementById('saveNewRow').style.display='none';
-  document.getElementById('inputServings').value=e.servings!==undefined ? e.servings : '1';
+  document.getElementById('inputServings').value=e.servings!==undefined?e.servings:'1';
+  document.querySelector('#logModalBg .modal').classList.add('auto-height');
   updateServingPreview();
   openModal('logModalBg');
   setTimeout(()=>document.getElementById('inputName').focus(),120);
@@ -818,26 +843,23 @@ function submitLogForm(){
   const pro=Math.round((parseInt(document.getElementById('inputPro').value)||0)*servings);
   if(!name){ document.getElementById('inputName').focus(); return; }
 
-  const historyOpen = document.getElementById('historyPanel').style.display !== 'none';
+  const historyOpen=document.getElementById('historyPanel').style.display!=='none';
   if(editingLogTs!==null){
     const baseCal=parseInt(document.getElementById('inputCal').value)||0;
     const basePro=parseInt(document.getElementById('inputPro').value)||0;
     DB.entries=DB.entries.map(e=>e.ts===editingLogTs?{...e,name,cal,pro,baseCal,basePro,servings}:e);
   } else {
-    const entryDate = historyOpen ? historyDate : todayStr();
-    let entryTs = Date.now();
-    if(historyOpen && entryDate !== todayStr()){
-      // set to 11:59 PM on the history date
-      const d = new Date(entryDate + 'T23:59:00');
-      entryTs = d.getTime();
+    const entryDate=historyOpen?historyDate:todayStr();
+    let entryTs=Date.now();
+    if(historyOpen&&entryDate!==todayStr()){
+      const d=new Date(entryDate+'T23:59:00'); entryTs=d.getTime();
     }
     DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,date:entryDate,ts:entryTs},...DB.entries];
     if(document.getElementById('saveItem').checked){
       const saved=DB.saved;
       if(!saved.find(s=>s.name.toLowerCase()===name.toLowerCase()))
         DB.saved=[...saved,{name,cal,pro}];
-      else
-        showToast('"'+name+'" is already in quick-add');
+      else showToast('"'+name+'" is already in quick-add');
     }
     if(!historyOpen){
       currentTab='day';
@@ -851,84 +873,87 @@ function submitLogForm(){
 }
 
 function closeLogModal(){
+  document.querySelector('#logModalBg .modal').classList.remove('auto-height');
   closeModal('logModalBg');
   editingLogTs=null; editingSaved=false;
   document.getElementById('newSavedBtn').style.display='none';
   document.getElementById('savedMgmt').classList.remove('managing');
   document.getElementById('inputServings').value='1';
-  document.getElementById('servingPreview').textContent=''; document.getElementById('servingPreview').style.display='none'; document.getElementById('servingPreviewLabel').style.display='none';
+  document.getElementById('servingPreview').textContent='';
+  document.getElementById('servingPreview').style.display='none';
+  document.getElementById('servingPreviewLabel').style.display='none';
 }
 
 function updateServingPreview(){
-  const servings = parseFloat(document.getElementById('inputServings').value)||1;
-  const cal = parseInt(document.getElementById('inputCal').value)||0;
-  const pro = parseInt(document.getElementById('inputPro').value)||0;
-  const el = document.getElementById('servingPreview');
-  if(servings !== 1 && (cal||pro)){
-    const totalCal = Math.round(cal*servings);
-    const totalPro = Math.round(pro*servings);
-    el.innerHTML = '' + '<span style="color:var(--accent)">' + servings + '</span>' + '<span style="color:var(--text)"> x [</span>' + '<span style="color:var(--header-fg)">' + cal + '</span>' + '<span style="color:var(--text)">,</span>' + '<span style="color:var(--edit-col)">' + pro + '</span>' + '<span style="color:var(--text)">]  =  </span>' + '<span style="color:var(--header-fg)">' + totalCal + '</span>' + '<span style="color:var(--text)"> kcal | </span>' + '<span style="color:var(--edit-col)">' + totalPro + '</span>' + '<span style="color:var(--text)"> g</span>';
-    el.style.display = '';
-    el.style.textAlign = 'center';
-    document.getElementById('servingPreviewLabel').style.display = '';
+  const servings=parseFloat(document.getElementById('inputServings').value)||1;
+  const cal=parseInt(document.getElementById('inputCal').value)||0;
+  const pro=parseInt(document.getElementById('inputPro').value)||0;
+  const el=document.getElementById('servingPreview');
+  if(servings!==1&&(cal||pro)){
+    const tCal=Math.round(cal*servings), tPro=Math.round(pro*servings);
+    el.innerHTML='<span style="color:var(--accent)">'+servings+'</span>'
+      +'<span style="color:var(--text)"> x [</span>'
+      +'<span style="color:var(--header-fg)">'+cal+'</span>'
+      +'<span style="color:var(--text)">,</span>'
+      +'<span style="color:var(--edit-col)">'+pro+'</span>'
+      +'<span style="color:var(--text)">]  =  </span>'
+      +'<span style="color:var(--header-fg)">'+tCal+'</span>'
+      +'<span style="color:var(--text)"> kcal | </span>'
+      +'<span style="color:var(--edit-col)">'+tPro+'</span>'
+      +'<span style="color:var(--text)"> g</span>';
+    el.style.display=''; el.style.textAlign='center';
+    document.getElementById('servingPreviewLabel').style.display='';
   } else {
-    el.textContent = '';
-    el.style.display = 'none';
-    document.getElementById('servingPreviewLabel').style.display = 'none';
+    el.textContent=''; el.style.display='none';
+    document.getElementById('servingPreviewLabel').style.display='none';
   }
 }
 ['inputServings','inputCal','inputPro'].forEach(id=>{
-  document.getElementById(id).addEventListener('input', updateServingPreview);
+  document.getElementById(id).addEventListener('input',updateServingPreview);
 });
 
-// ── Saved Items ───────────────────────────────────────
 function renderSavedChips(){
   const saved=DB.saved;
   const el=document.getElementById('savedList');
   if(!saved.length){ el.innerHTML='<span style="font-size:11px;color:var(--muted)">No saved items yet</span>'; return; }
   const sorted=[...saved].map((s,i)=>({...s,origIdx:i})).sort((a,b)=>a.name.localeCompare(b.name));
-
-  // Calculate calories remaining today for colour coding
   const goals=DB.goals;
   const todayEntries=DB.entries.filter(e=>e.date===todayStr());
   const todayTotal=todayEntries.reduce((s,e)=>s+(e.cal||0),0);
-  const dailyGoal=goals.cal||2000;
-  const calLeft=dailyGoal-todayTotal;
-
-  el.innerHTML=sorted.map(function(item){
-    const name=item.name, cal=item.cal, pro=item.pro||0, origIdx=item.origIdx;
-    const editBtns = editingSaved
-      ? '<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+origIdx+')">✎</button>'
-        + '<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+origIdx+')">×</button>'
-      : '';
-    const clickAttr = editingSaved ? '' : 'onclick="quickAdd('+origIdx+')"';
-    const overLimit = !editingSaved && cal > calLeft;
-    const chipClass = editingSaved ? 'saved-chip managing' : 'saved-chip normal' + (overLimit ? ' over-limit' : '');
-    const proStr = pro > 0 ? ' · <span style="color:var(--accent2)">'+pro+' g</span>' : '';
+  const calLeft=(goals.cal||2000)-todayTotal;
+  el.innerHTML=sorted.map(item=>{
+    const {name,cal,pro,origIdx}=item;
+    const editBtns=editingSaved
+      ?'<button class="chip-edit-btn" title="Edit" onclick="openEditSavedModal('+origIdx+')">✎</button>'
+       +'<button class="chip-del-btn" title="Delete" onclick="deleteSaved('+origIdx+')">×</button>'
+      :'';
+    const clickAttr=editingSaved?'':'onclick="quickAdd('+origIdx+')"';
+    const overLimit=!editingSaved&&cal>calLeft;
+    const chipClass=editingSaved?'saved-chip managing':'saved-chip normal'+(overLimit?' over-limit':'');
+    const proStr=pro>0?' · <span style="color:var(--accent2)">'+pro+' g</span>':'';
     return '<span class="'+chipClass+'" '+clickAttr+'>'
-      + '<span class="chip-name">'+esc(name)+' <span style="color:var(--muted)">'+cal+' kcal</span>'+proStr+'</span>'
-      + editBtns
-      + '</span>';
+      +'<span class="chip-name">'+esc(name)+' <span style="color:var(--muted)">'+cal+' kcal</span>'+proStr+'</span>'
+      +editBtns+'</span>';
   }).join('');
 }
 
 function openNewSavedModal(){
-  editingSavedIdx = null; // null = new item
-  document.getElementById('editSavedTitle').textContent = 'New Saved Item';
-  document.getElementById('editSavedTitle').style.color = 'var(--edit-col)';
-  document.getElementById('editSavedName').value = '';
-  document.getElementById('editSavedCal').value  = '';
-  document.getElementById('editSavedPro').value  = '';
+  editingSavedIdx=null;
+  document.getElementById('editSavedTitle').textContent='New Saved Item';
+  document.getElementById('editSavedTitle').style.color='var(--edit-col)';
+  document.getElementById('editSavedName').value='';
+  document.getElementById('editSavedCal').value='';
+  document.getElementById('editSavedPro').value='';
   openModal('editSavedBg');
   setTimeout(()=>document.getElementById('editSavedName').focus(),120);
 }
 
 function deleteSaved(i){
   const s=DB.saved;
-  showConfirm('Remove "'+s[i].name+'" from saved?', ()=>{
+  showConfirm('Remove "'+s[i].name+'" from saved?',()=>{
     s.splice(i,1); DB.saved=s;
     renderSavedChips();
-    if(document.getElementById('managePanel').style.display !== 'none') renderManagePanel();
+    if(document.getElementById('managePanel').style.display!=='none') renderManagePanel();
   });
 }
 
@@ -941,12 +966,11 @@ function quickAdd(i){
   updateServingPreview();
 }
 
-// ── Edit Saved Modal ──────────────────────────────────
 function openEditSavedModal(i){
   editingSavedIdx=i;
   const s=DB.saved[i];
-  document.getElementById('editSavedTitle').textContent = 'Edit Saved Item';
-  document.getElementById('editSavedTitle').style.color = 'var(--edit-col)';
+  document.getElementById('editSavedTitle').textContent='Edit Saved Item';
+  document.getElementById('editSavedTitle').style.color='var(--edit-col)';
   document.getElementById('editSavedName').value=s.name;
   document.getElementById('editSavedCal').value=s.cal;
   document.getElementById('editSavedPro').value=s.pro;
@@ -961,71 +985,50 @@ function saveEditedSaved(){
   if(!name){ document.getElementById('editSavedName').focus(); return; }
   const saved=DB.saved;
   if(editingSavedIdx===null){
-    // New item — check for duplicate
-    if(saved.find(s=>s.name.toLowerCase()===name.toLowerCase())){
-      showToast('"'+name+'" is already in quick-add');
-      return;
-    }
+    if(saved.find(s=>s.name.toLowerCase()===name.toLowerCase())){ showToast('"'+name+'" is already in quick-add'); return; }
     saved.push({name,cal,pro});
   } else {
-    // Edit existing — check for duplicate excluding current item
-    const duplicate = saved.find((s,i)=>i!==editingSavedIdx && s.name.toLowerCase()===name.toLowerCase());
-    if(duplicate){
-      showToast('"'+name+'" is already in quick-add');
-      return;
-    }
+    if(saved.find((s,i)=>i!==editingSavedIdx&&s.name.toLowerCase()===name.toLowerCase())){ showToast('"'+name+'" is already in quick-add'); return; }
     saved[editingSavedIdx]={name,cal,pro};
   }
   DB.saved=saved;
   closeEditSavedModal();
   renderSavedChips();
-  if(document.getElementById('managePanel').style.display !== 'none') renderManagePanel();
+  if(document.getElementById('managePanel').style.display!=='none') renderManagePanel();
 }
 
 function closeEditSavedModal(){ closeModal('editSavedBg'); editingSavedIdx=null; }
 
-// ── Toast ─────────────────────────────────────────────
 function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  document.addEventListener('click', hideToast, {once:true, capture:true});
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  document.addEventListener('click',hideToast,{once:true,capture:true});
 }
-function hideToast(){
-  document.getElementById('toast').classList.remove('show');
-}
+function hideToast(){ document.getElementById('toast').classList.remove('show'); }
 
-// ── Goals ─────────────────────────────────────────────
-const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
 function initGoalsUI(){
-  const goals = DB.goals;
-  const mode = goals.mode || 'daily';
-  setGoalMode(mode, true);
-  // populate weekly fields
-  const weekly = goals.weekly || [2000,2000,2000,2000,2000,2000,2000];
-  DAYS.forEach((d,i)=>{
-    const el = document.getElementById('weeklyDay'+i);
-    if(el) el.value = weekly[i];
-  });
+  const goals=DB.goals;
+  const mode=goals.mode||'daily';
+  setGoalMode(mode,true);
+  const weekly=goals.weekly||[2000,2000,2000,2000,2000,2000,2000];
+  DAYS.forEach((_,i)=>{ const el=document.getElementById('weeklyDay'+i); if(el) el.value=weekly[i]; });
   if(document.getElementById('goalProWeekly'))
-    document.getElementById('goalProWeekly').value = goals.proWeekly || goals.pro || 150;
+    document.getElementById('goalProWeekly').value=goals.proWeekly||goals.pro||150;
 }
 
-function setGoalMode(mode, silent){
-  const isWeekly = mode==='weekly';
-  document.getElementById('goalFieldsDaily').style.display  = isWeekly ? 'none' : '';
-  document.getElementById('goalFieldsWeekly').style.display = isWeekly ? '' : 'none';
-  document.getElementById('goalModeDaily').style.background  = isWeekly ? 'var(--surface2)' : 'var(--header-fg)';
-  document.getElementById('goalModeDaily').style.color       = isWeekly ? 'var(--muted)'    : 'var(--btn-fg)';
-  document.getElementById('goalModeWeekly').style.background = isWeekly ? 'var(--header-fg)': 'var(--surface2)';
-  document.getElementById('goalModeWeekly').style.color      = isWeekly ? 'var(--btn-fg)'   : 'var(--muted)';
-
-  // Build weekly day fields if not yet built
-  if(isWeekly && !document.getElementById('weeklyDay0')){
-    const goals = DB.goals;
-    const weekly = goals.weekly || [2000,2000,2000,2000,2000,2000,2000];
-    document.getElementById('weeklyDayFields').innerHTML = DAYS.map((d,i)=>`
+function setGoalMode(mode,silent){
+  const isWeekly=mode==='weekly';
+  document.getElementById('goalFieldsDaily').style.display=isWeekly?'none':'';
+  document.getElementById('goalFieldsWeekly').style.display=isWeekly?'':'none';
+  document.getElementById('goalModeDaily').style.background=isWeekly?'var(--surface2)':'var(--header-fg)';
+  document.getElementById('goalModeDaily').style.color=isWeekly?'var(--muted)':'var(--btn-fg)';
+  document.getElementById('goalModeWeekly').style.background=isWeekly?'var(--header-fg)':'var(--surface2)';
+  document.getElementById('goalModeWeekly').style.color=isWeekly?'var(--btn-fg)':'var(--muted)';
+  if(isWeekly&&!document.getElementById('weeklyDay0')){
+    const weekly=DB.goals.weekly||[2000,2000,2000,2000,2000,2000,2000];
+    document.getElementById('weeklyDayFields').innerHTML=DAYS.map((d,i)=>`
       <div style="display:flex;align-items:center;gap:10px;">
         <span style="font-size:11px;color:var(--muted);width:36px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;">${d.slice(0,3)}</span>
         <input type="number" id="weeklyDay${i}" placeholder="2000" value="${weekly[i]}"
@@ -1033,61 +1036,50 @@ function setGoalMode(mode, silent){
       </div>
     `).join('');
   }
-  if(!silent){ const g=DB.goals; g.mode=mode; DB.goals=g; render(); }
+  if(!silent){ window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0; const g=DB.goals; g.mode=mode; DB.goals=g; render(); }
 }
 
 function saveGoals(){
-  const goals = DB.goals;
-  const mode = goals.mode || 'daily';
+  const goals=DB.goals;
+  const mode=goals.mode||'daily';
   if(mode==='weekly'){
-    const weekly = DAYS.map((_,i)=>parseInt(document.getElementById('weeklyDay'+i).value)||2000);
-    const proWeekly = parseInt(document.getElementById('goalProWeekly').value)||150;
-    DB.goals={...goals, mode:'weekly', weekly, proWeekly, pro:proWeekly};
+    const weekly=DAYS.map((_,i)=>parseInt(document.getElementById('weeklyDay'+i).value)||2000);
+    const proWeekly=parseInt(document.getElementById('goalProWeekly').value)||150;
+    DB.goals={...goals,mode:'weekly',weekly,proWeekly,pro:proWeekly};
   } else {
     const cal=parseInt(document.getElementById('goalCal').value)||2000;
     const pro=parseInt(document.getElementById('goalPro').value)||150;
-    DB.goals={...goals, mode:'daily', cal, pro};
+    DB.goals={...goals,mode:'daily',cal,pro};
   }
   render();
 }
 
-// ── History ───────────────────────────────────────────
-let historyDate = todayStr(); // currently viewed date in history
+let historyDate=todayStr();
 
 function historyShift(dir){
-  const d = new Date(historyDate + 'T12:00:00');
-  d.setDate(d.getDate() + dir);
-  const next = localDateStr(d);
-  // don't go into the future
-  if(next > todayStr()) return;
-  historyDate = next;
+  const d=new Date(historyDate+'T12:00:00');
+  d.setDate(d.getDate()+dir);
+  const next=localDateStr(d);
+  if(next>todayStr()) return;
+  historyDate=next;
   renderHistory();
 }
 
 function renderHistory(){
-  const entries = DB.entries.filter(e => e.date === historyDate);
-  const totalCal = entries.reduce((s,e) => s+(e.cal||0), 0);
-  const totalPro = entries.reduce((s,e) => s+(e.pro||0), 0);
-
-  // date label
-  const d = new Date(historyDate + 'T12:00:00');
-  const isToday = historyDate === todayStr();
-  document.getElementById('historyDateLabel').textContent = isToday
-    ? 'TODAY'
-    : d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
-
-  // disable next arrow if we're at today
-  document.getElementById('historyNextBtn').disabled = isToday;
-
-  document.getElementById('hCalVal').textContent = totalCal;
-  document.getElementById('hProVal').textContent = totalPro;
-
-  const el = document.getElementById('historyEntries');
-  if(!entries.length){
-    el.innerHTML = '<div class="empty">NO ENTRIES FOR THIS DAY</div>';
-    return;
-  }
-  el.innerHTML = [...entries].sort((a,b)=>a.ts-b.ts).map(e=>`
+  const entries=DB.entries.filter(e=>e.date===historyDate);
+  const totalCal=entries.reduce((s,e)=>s+(e.cal||0),0);
+  const totalPro=entries.reduce((s,e)=>s+(e.pro||0),0);
+  const d=new Date(historyDate+'T12:00:00');
+  const isToday=historyDate===todayStr();
+  document.getElementById('historyDateLabel').textContent=isToday
+    ?'TODAY'
+    :d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+  document.getElementById('historyNextBtn').disabled=isToday;
+  document.getElementById('hCalVal').textContent=totalCal;
+  document.getElementById('hProVal').textContent=totalPro;
+  const el=document.getElementById('historyEntries');
+  if(!entries.length){ el.innerHTML='<div class="empty">NO ENTRIES FOR THIS DAY</div>'; return; }
+  el.innerHTML=[...entries].sort((a,b)=>a.ts-b.ts).map(e=>`
     <div class="entry">
       <div style="flex:1;min-width:0;">
         <div class="entry-name">${esc(e.name)}</div>
@@ -1098,7 +1090,7 @@ function renderHistory(){
         <div class="entry-pro">${e.pro} g</div>
       </div>
       <div class="entry-actions">
-        <button class="icon-btn edit" title="Edit"   onclick="openEditLogModal(${e.ts})">✎</button>
+        <button class="icon-btn edit" title="Edit" onclick="openEditLogModal(${e.ts})">✎</button>
         <button class="icon-btn del"  title="Delete" onclick="deleteEntryHistory(${e.ts})">×</button>
       </div>
     </div>
@@ -1107,30 +1099,22 @@ function renderHistory(){
 
 function deleteEntryHistory(ts){
   const e=DB.entries.find(e=>e.ts===ts);
-  showConfirm('Remove "'+(e?e.name:'this entry')+'"?', ()=>{
+  showConfirm('Remove "'+(e?e.name:'this entry')+'"?',()=>{
     DB.entries=DB.entries.filter(e=>e.ts!==ts);
     renderHistory();
     document.getElementById('streakNum').textContent=calcStreak();
   });
 }
 
-// ── Confirm Delete ────────────────────────────────────
-let _confirmCallback = null;
-function showConfirm(msg, callback){
-  _confirmCallback = callback;
-  document.getElementById('confirmDeleteMsg').textContent = msg;
+let _confirmCallback=null;
+function showConfirm(msg,callback){
+  _confirmCallback=callback;
+  document.getElementById('confirmDeleteMsg').textContent=msg;
   openModal('confirmDeleteBg');
 }
-function confirmDeleteAction(){
-  closeModal('confirmDeleteBg');
-  if(_confirmCallback) _confirmCallback();
-  _confirmCallback = null;
-}
-function closeConfirm(){
-  closeModal('confirmDeleteBg');
-  _confirmCallback = null;
-}
-function openModal(id) { document.getElementById(id).classList.add('open'); }
+function confirmDeleteAction(){ closeModal('confirmDeleteBg'); if(_confirmCallback) _confirmCallback(); _confirmCallback=null; }
+function closeConfirm(){ closeModal('confirmDeleteBg'); _confirmCallback=null; }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 function closeModalOutside(e,id){
   if(e.target!==document.getElementById(id)) return;
@@ -1139,13 +1123,11 @@ function closeModalOutside(e,id){
   else if(id==='confirmDeleteBg') closeConfirm();
 }
 
-// ── Tabs ──────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
     currentTab=t.dataset.tab;
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
-    window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0;
-    // close all panels when switching main tabs
+    window.scrollTo(0,0);
     closeSpeedDial();
     document.getElementById('app').style.display='';
     document.getElementById('historyPanel').style.display='none';
@@ -1160,41 +1142,33 @@ document.querySelectorAll('.tab').forEach(t=>{
   });
 });
 
-// ── Speed Dial ────────────────────────────────────────
 function toggleSpeedDial(){
-  const panel  = document.getElementById('speedDialItems');
-  const trigger= document.getElementById('speedDialTrigger');
-  const isOpen = panel.classList.contains('open');
-  panel.classList.toggle('open', !isOpen);
-  trigger.style.display = isOpen ? 'flex' : 'none';
-  document.getElementById('speedDialBtn').classList.toggle('active', !isOpen);
+  const panel=document.getElementById('speedDialPanel');
+  const btn=document.getElementById('speedDialBtn');
+  const isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  btn.classList.toggle('active',!isOpen);
 }
 function closeSpeedDial(){
-  document.getElementById('speedDialItems').classList.remove('open');
-  document.getElementById('speedDialTrigger').style.display = 'flex';
+  document.getElementById('speedDialPanel').classList.remove('open');
   document.getElementById('speedDialBtn').classList.remove('active');
 }
 
-// ── Goals toggle ───────────────────────────────────────
 function toggleGoals(){
   closeSpeedDial();
-  const panel = document.getElementById('goalsPanel');
-  const app   = document.getElementById('app');
-  const hPanel= document.getElementById('historyPanel');
-  const fab   = document.getElementById('goalsFab');
-  const isOpen = panel.style.display !== 'none';
+  const panel=document.getElementById('goalsPanel');
+  const app=document.getElementById('app');
+  const fab=document.getElementById('goalsFab');
+  const isOpen=panel.style.display!=='none';
   if(isOpen){
-    panel.style.display='none';
-    app.style.display='';
+    panel.style.display='none'; app.style.display='';
     fab.classList.remove('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
   } else {
-    // close history and manage if open
     closeHistory();
     document.getElementById('managePanel').style.display='none';
     document.getElementById('manageFab').classList.remove('active');
-    panel.style.display='';
-    app.style.display='none';
+    panel.style.display=''; app.style.display='none';
     fab.classList.add('active');
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0;
@@ -1202,12 +1176,11 @@ function toggleGoals(){
   }
 }
 
-// ── History toggle ─────────────────────────────────────
 function toggleHistory(){
   closeSpeedDial();
-  const panel = document.getElementById('historyPanel');
-  const isOpen = panel.style.display !== 'none';
-  if(isOpen){ closeHistory(); } else { openHistory(); }
+  const panel=document.getElementById('historyPanel');
+  const isOpen=panel.style.display!=='none';
+  if(isOpen) closeHistory(); else openHistory();
 }
 function closeHistory(){
   document.getElementById('historyPanel').style.display='none';
@@ -1218,29 +1191,24 @@ function closeHistory(){
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
 }
 function openHistory(){
-  window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0;
+  window.scrollTo(0,0);
   document.getElementById('goalsPanel').style.display='none';
   document.getElementById('goalsFab').classList.remove('active');
   document.getElementById('managePanel').style.display='none';
   document.getElementById('manageFab').classList.remove('active');
   document.getElementById('historyPanel').style.display='';
-  document.getElementById('historyPanel').scrollTop=0;
-  document.getElementById('historyEntries').scrollTop=0;
   document.getElementById('app').style.display='none';
   document.getElementById('historyFab').classList.add('active');
   document.getElementById('addFab').classList.add('history-mode');
   document.getElementById('historyPanelHeader').classList.add('history-active');
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  historyDate = todayStr();
+  historyDate=todayStr();
   renderHistory();
 }
 
-// ── Keyboard ──────────────────────────────────────────
-document.addEventListener('click', e => {
-  const dial = document.getElementById('speedDial');
-  if(dial && !dial.contains(e.target)){
-    closeSpeedDial();
-  }
+document.addEventListener('click',e=>{
+  const dial=document.getElementById('speedDial');
+  if(dial&&!dial.contains(e.target)) closeSpeedDial();
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
@@ -1250,9 +1218,8 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ closeLogModal(); closeEditSavedModal(); }
 });
 
-// ── Init ──────────────────────────────────────────────
-document.getElementById('headerDate').textContent =
-  new Date().toLocaleDateString('en-US', {timeZone: TZ, weekday:'long', month:'long', day:'numeric'}).toUpperCase();
+document.getElementById('headerDate').textContent=
+  new Date().toLocaleDateString('en-US',{timeZone:TZ,weekday:'long',month:'long',day:'numeric'}).toUpperCase();
 render();
 </script>
 </body>
