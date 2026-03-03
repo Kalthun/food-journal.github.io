@@ -164,6 +164,19 @@
   .fab:active { transform:scale(.93); }
   .fab.history-mode { background:var(--edit-col); box-shadow:0 4px 20px rgba(182,146,123,.4); }
 
+  /* ── Speed Dial overlay ── */
+  .sd-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0);
+    z-index: 199;
+    transition: background .25s;
+  }
+  .sd-overlay.open {
+    display: block;
+    background: rgba(0,0,0,.6);
+  }
+
   /* ── Speed Dial ── */
   .speed-dial {
     position: fixed;
@@ -173,68 +186,60 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0;
+    gap: 12px;
   }
 
-  /* The popup options panel — sits above trigger, no background on trigger itself */
+  /* Options — hidden by default, revealed when open */
   .speed-dial-panel {
-    display: none;
+    display: flex;
     flex-direction: column;
-    gap: 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px 14px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 24px rgba(0,0,0,.5);
-    animation: dialIn .18s ease;
+    gap: 12px;
+    pointer-events: none;
   }
-  .speed-dial-panel.open { display: flex; }
-  @keyframes dialIn {
-    from { opacity:0; transform:translateY(8px) scale(.97); }
-    to   { opacity:1; transform:translateY(0) scale(1); }
-  }
+  .speed-dial-panel.open { pointer-events: auto; }
 
-  /* Each row: circle icon + pill label */
+  /* Each row: circle icon + label */
   .speed-dial-item {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .2s, transform .2s;
   }
+  .speed-dial-panel.open .speed-dial-item:nth-child(3) { opacity:1; transform:translateY(0); transition-delay: .03s; }
+  .speed-dial-panel.open .speed-dial-item:nth-child(2) { opacity:1; transform:translateY(0); transition-delay: .08s; }
+  .speed-dial-panel.open .speed-dial-item:nth-child(1) { opacity:1; transform:translateY(0); transition-delay: .13s; }
 
-  /* Circle icon button */
+  /* Circle icon — same size as trigger */
   .sd-icon-btn {
-    width: 50px; height: 50px; border-radius: 50%;
-    background: var(--surface);
+    width: 54px; height: 54px; border-radius: 50%;
+    background: var(--surface2);
     border: 1px solid var(--border);
     color: var(--text);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    transition: background .15s, border-color .15s;
+    box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    transition: background .15s, border-color .15s, transform .15s;
   }
   .sd-icon-btn:active { transform: scale(.93); }
   .sd-icon-btn.active { background: var(--accent); color: var(--btn-fg); border-color: var(--accent); }
 
-  /* Pill label */
+  /* Label next to each button */
   .sd-label {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 99px;
-    padding: 7px 16px;
     font-family: 'DM Mono', monospace;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--text);
     white-space: nowrap;
     cursor: pointer;
-    transition: border-color .15s, color .15s;
+    text-shadow: 0 1px 6px rgba(0,0,0,.9);
   }
-  .sd-label:hover { border-color: var(--muted); color: var(--text); }
 
-  /* Trigger button — standalone, no panel background */
+  /* Trigger button */
   .sd-trigger-btn {
     width: 54px; height: 54px; border-radius: 50%;
     background: var(--surface2);
@@ -505,9 +510,11 @@
 <!-- ══ FAB ══ -->
 <button class="fab" id="addFab" onclick="openAddModal()">+</button>
 
+<!-- ══ SPEED DIAL OVERLAY ══ -->
+<div class="sd-overlay" id="sdOverlay" onclick="closeSpeedDial()"></div>
+
 <!-- ══ SPEED DIAL ══ -->
 <div class="speed-dial" id="speedDial">
-  <!-- Popup options panel (no trigger button inside) -->
   <div class="speed-dial-panel" id="speedDialPanel">
     <div class="speed-dial-item">
       <button class="sd-icon-btn" id="manageFab" title="Quick-Add" onclick="toggleManage()">
@@ -539,7 +546,6 @@
     </div>
   </div>
 
-  <!-- Standalone trigger — outside the panel -->
   <button class="sd-trigger-btn" id="speedDialBtn" onclick="toggleSpeedDial()">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -1145,13 +1151,16 @@ document.querySelectorAll('.tab').forEach(t=>{
 function toggleSpeedDial(){
   const panel=document.getElementById('speedDialPanel');
   const btn=document.getElementById('speedDialBtn');
+  const overlay=document.getElementById('sdOverlay');
   const isOpen=panel.classList.contains('open');
   panel.classList.toggle('open',!isOpen);
   btn.classList.toggle('active',!isOpen);
+  overlay.classList.toggle('open',!isOpen);
 }
 function closeSpeedDial(){
   document.getElementById('speedDialPanel').classList.remove('open');
   document.getElementById('speedDialBtn').classList.remove('active');
+  document.getElementById('sdOverlay').classList.remove('open');
 }
 
 function toggleGoals(){
@@ -1206,10 +1215,6 @@ function openHistory(){
   renderHistory();
 }
 
-document.addEventListener('click',e=>{
-  const dial=document.getElementById('speedDial');
-  if(dial&&!dial.contains(e.target)) closeSpeedDial();
-});
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
     if(document.getElementById('logModalBg').classList.contains('open')) submitLogForm();
