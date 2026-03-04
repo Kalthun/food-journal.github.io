@@ -414,6 +414,7 @@ let editingComboIdx = null;
 let logTab          = 'quick';
 let quickTab        = 'items';
 let historyDate     = '';
+let pendingComboItems = null;
 
 // ── Helpers ──────────────────────────────────────────
 const TZ           = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -498,18 +499,52 @@ function render(){
 
   const el=document.getElementById('entries');
   if(!entries.length){el.innerHTML='<div class="empty">NO ENTRIES YET</div>';return;}
-  el.innerHTML=[...entries].sort((a,b)=>a.ts-b.ts).map(e=>`
-    <div class="entry">
-      <div style="flex:1;min-width:0;"><div class="entry-name">${esc(e.name)}</div><div class="entry-time">${fmtTime(e.ts)} · ${e.date}</div></div>
-      <div class="entry-info"><div class="entry-cal">${e.cal} kcal</div><div class="entry-pro">${e.pro} g</div></div>
-      <div class="entry-actions">
-        <button class="icon-btn edit" onclick="openEditLogModal(${e.ts})">✎</button>
-        <button class="icon-btn del"  onclick="deleteEntry(${e.ts})">×</button>
-      </div>
-    </div>`).join('');
+  el.innerHTML=[...entries].sort((a,b)=>a.ts-b.ts).map(e=>renderEntry(e,'deleteEntry')).join('');
 }
 
-// ── Log Entry CRUD ────────────────────────────────────
+// ── Entry renderer ────────────────────────────────────
+function renderEntry(e, deleteHandler, showDate=true){
+  const uid='entry'+e.ts;
+  const hasCombo=e.comboItems&&e.comboItems.length;
+  const timeStr=fmtTime(e.ts)+(showDate&&e.date?' · '+e.date:'');
+
+  const mainRow=
+    '<div style="flex:1;min-width:0;">'
+    +'<div class="entry-name">'+esc(e.name)+(hasCombo?' <span style="font-size:9px;color:var(--combo-col);letter-spacing:1px;vertical-align:middle;">COMBO</span>':'')+'</div>'
+    +'<div class="entry-time">'+timeStr+'</div>'
+    +'</div>'
+    +'<div class="entry-info"><div class="entry-cal">'+e.cal+' kcal</div><div class="entry-pro">'+e.pro+' g</div></div>'
+    +'<div class="entry-actions"'+(hasCombo?' onclick="event.stopPropagation()"':'')+'>'
+    +'<button class="icon-btn edit" onclick="openEditLogModal('+e.ts+')">✎</button>'
+    +'<button class="icon-btn del" onclick="'+deleteHandler+'('+e.ts+')">×</button>'
+    +'</div>';
+
+  if(!hasCombo){
+    return '<div class="entry">'+mainRow+'</div>';
+  }
+
+  const itemLines=e.comboItems.map(it=>
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;gap:8px;">'
+    +'<span style="font-size:12px;color:var(--text);">'+esc(it.name)+'</span>'
+    +'<span style="font-size:11px;white-space:nowrap;flex-shrink:0;">'
+    +(it.qty!==1?'<span style="color:var(--muted)">'+it.qty+' x</span> ':'')
+    +'<span style="color:var(--accent)">'+Math.round(it.cal*it.qty)+' kcal</span>'
+    +(it.pro?' <span style="color:var(--muted)">|</span> <span style="color:var(--accent2)">'+Math.round(it.pro*it.qty)+' g</span>':'')
+    +'</span></div>'
+  ).join('');
+
+  return '<div class="entry" style="flex-direction:column;align-items:stretch;cursor:pointer;border-color:var(--combo-col);" onclick="toggleEntryCombo(this)">'
+    +'<div style="display:flex;align-items:center;gap:10px;">'+mainRow+'</div>'
+    +'<div class="combo-expand" style="display:none;flex-direction:column;gap:0;padding:6px 8px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-top:4px;">'+itemLines+'</div>'
+    +'</div>';
+}
+
+function toggleEntryCombo(el){
+  const expand=el.querySelector('.combo-expand');
+  if(!expand)return;
+  const open=expand.style.display!=='none';
+  expand.style.display=open?'none':'flex';
+}
 function deleteEntry(ts){
   const e=DB.entries.find(e=>e.ts===ts);
   showConfirm('Remove "'+(e?e.name:'this entry')+'"?',()=>{DB.entries=DB.entries.filter(e=>e.ts!==ts);render();});
@@ -586,7 +621,9 @@ function submitLogForm(){
     const entryDate=historyOpen?historyDate:todayStr();
     let entryTs=Date.now();
     if(historyOpen&&entryDate!==todayStr()){const d=new Date(entryDate+'T23:59:00');entryTs=d.getTime();}
-    DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,date:entryDate,ts:entryTs},...DB.entries];
+    const comboItems=pendingComboItems||null;
+    pendingComboItems=null;
+    DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,date:entryDate,ts:entryTs,...(comboItems?{comboItems}:{})},...DB.entries];
     if(document.getElementById('saveItem').checked){
       const saved=DB.saved;
       if(!saved.find(s=>s.name.toLowerCase()===name.toLowerCase())){
@@ -608,6 +645,7 @@ function submitLogForm(){
 function closeLogModal(){
   closeModal('logModalBg');
   editingLogTs=null;
+  pendingComboItems=null;
   document.getElementById('logModal').classList.remove('auto-height');
   document.getElementById('inputServings').value='1';
   document.getElementById('servingPreview').style.display='none';
@@ -628,7 +666,7 @@ function updateServingPreview(){
   const cal=parseInt(calEl.value)||0;
   const pro=parseInt(proEl.value)||0;
   const hasInput=nameEl.value.trim()||cal||pro;
-  if(divider)divider.style.display=(hasInput||logTab==='combo')?'none':'';
+  if(divider&&editingLogTs===null)divider.style.display=(hasInput||logTab==='combo')?'none':'';
   if(servings!==1&&(cal||pro)){
     const tCal=Math.round(cal*servings),tPro=Math.round(pro*servings);
     preview.innerHTML='<span style="color:var(--accent)">'+tCal+'</span><span style="color:var(--text)"> kcal</span><span style="color:var(--muted)"> | </span><span style="color:var(--accent2)">'+tPro+'</span><span style="color:var(--text)"> g</span>';
@@ -656,6 +694,7 @@ function setLogTab(tab){
   document.getElementById('saveNewRow').style.display=isCombo?'none':'';
   const nameLabel=document.getElementById('inputNameLabel');
   if(nameLabel)nameLabel.textContent=isCombo?'COMBO NAME':'ITEM NAME';
+  if(!isCombo){const n=document.getElementById('inputName');if(n)n._comboItems=null;pendingComboItems=null;}
   // lock name/cal/pro on combo tab
   ['inputName','inputCal','inputPro'].forEach(id=>{
     const el=document.getElementById(id);
@@ -748,6 +787,7 @@ function quickAddCombo(i){
   document.getElementById('inputCal').value=totalCal;
   document.getElementById('inputPro').value=totalPro;
   document.getElementById('inputServings').value='1';
+  pendingComboItems=combo.items;
   updateServingPreview();
 }
 
@@ -1061,15 +1101,7 @@ function renderHistory(){
   if(nextBtn)nextBtn.disabled=isToday;
   const el=document.getElementById('historyEntries');
   if(!entries.length){el.innerHTML='<div class="empty">NO ENTRIES FOR THIS DAY</div>';return;}
-  el.innerHTML=[...entries].sort((a,b)=>a.ts-b.ts).map(e=>`
-    <div class="entry">
-      <div style="flex:1;min-width:0;"><div class="entry-name">${esc(e.name)}</div><div class="entry-time">${fmtTime(e.ts)}</div></div>
-      <div class="entry-info"><div class="entry-cal">${e.cal} kcal</div><div class="entry-pro">${e.pro} g</div></div>
-      <div class="entry-actions">
-        <button class="icon-btn edit" onclick="openEditLogModal(${e.ts})">✎</button>
-        <button class="icon-btn del"  onclick="deleteEntryHistory(${e.ts})">×</button>
-      </div>
-    </div>`).join('');
+  el.innerHTML=[...entries].sort((a,b)=>a.ts-b.ts).map(e=>renderEntry(e,'deleteEntryHistory',false)).join('');
 }
 
 function deleteEntryHistory(ts){
