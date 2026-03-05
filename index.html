@@ -551,7 +551,7 @@ function renderEntry(e, deleteHandler, showDate=true){
     return '<div class="entry">'+mainRow+'</div>';
   }
 
-  const itemLines=e.comboItems.map(it=>
+  const itemLines=[...e.comboItems].sort((a,b)=>a.name.localeCompare(b.name)).map(it=>
     '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;gap:8px;">'
     +'<span style="font-size:12px;color:var(--text);">'+esc(it.name)+'</span>'
     +'<span style="font-size:11px;white-space:nowrap;flex-shrink:0;">'
@@ -933,7 +933,7 @@ function renderManageCombos(){
   el.innerHTML=sorted.map(combo=>{
     const totalCal=Math.ceil(combo.items.reduce((s,it)=>s+it.cal*it.qty,0));
     const totalPro=Math.floor(combo.items.reduce((s,it)=>s+it.pro*it.qty,0));
-    const itemLines=combo.items.map(it=>
+    const itemLines=[...combo.items].sort((a,b)=>a.name.localeCompare(b.name)).map(it=>
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;gap:8px;">'
       +'<span style="font-size:12px;color:var(--text);">'+esc(it.name)+'</span>'
       +'<span style="font-size:11px;white-space:nowrap;flex-shrink:0;">'
