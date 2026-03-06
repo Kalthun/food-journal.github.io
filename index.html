@@ -365,7 +365,7 @@
         <div><label style="color:var(--accent);">CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="0" style="border-color:var(--accent);"></div>
         <div><label style="color:var(--accent2);">PROTEIN (g)</label><input type="number" id="inputPro" placeholder="0" style="border-color:var(--accent2);"></div>
       </div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr;align-items:end;">
+      <div class="form-row" id="sizeUnitRow" style="grid-template-columns:1fr 1fr;align-items:end;">
         <div><label style="color:var(--tab-act);">SIZE</label><input type="text" id="inputSize" placeholder="0" style="border-color:var(--tab-act);"></div>
         <div><label style="color:var(--tab-act);">UNIT</label>
           <select id="inputUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
@@ -507,6 +507,7 @@
 // ── Unit select helpers ───────────────────────────────
 function onUnitChange(sel){
   if(sel.value!=='__custom__')return;
+  const h=sel.offsetHeight||44;
   const inp=document.createElement('input');
   inp.type='text';
   inp.id=sel.id;
@@ -514,20 +515,34 @@ function onUnitChange(sel){
   inp.autocomplete='off';
   inp.style.cssText=sel.style.cssText;
   inp.style.borderColor='var(--tab-act)';
-  // wrap in a relative container with a reset button
-  const wrap=document.createElement('div');
-  wrap.style.cssText='position:relative;display:flex;align-items:center;';
-  inp.style.paddingRight='28px';
+  inp.style.flex='1';
+  inp.style.minWidth='0';
   const btn=document.createElement('button');
   btn.type='button';
   btn.textContent='×';
-  btn.title='Back to list';
-  btn.style.cssText='position:absolute;right:8px;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0;line-height:1;';
-  btn.onclick=()=>resetUnitSelect(sel.id);
+  btn.style.cssText='flex-shrink:0;width:'+h+'px;height:'+h+'px;background:rgba(139,164,176,.15);border:1px solid var(--tab-act);border-radius:8px;color:var(--tab-act);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+  btn.onclick=function(){resetUnitSelect(inp.id);};
+  const wrap=document.createElement('div');
+  wrap.id='_unitWrap';
+  wrap.style.cssText='display:flex;gap:8px;align-items:stretch;';
   wrap.appendChild(inp);
   wrap.appendChild(btn);
   sel.parentNode.replaceChild(wrap,sel);
   inp.focus();
+}
+function resetUnitSelect(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el.tagName==='SELECT'){el.selectedIndex=0;return;}
+  const sel=document.createElement('select');
+  sel.id=id;sel.onchange=function(){onUnitChange(this);};
+  sel.style.cssText=el.style.cssText;
+  sel.style.flex='';sel.style.minWidth='';
+  sel.innerHTML='<option value="">—</option><option value="cup">cup</option><option value="g">g</option><option value="kg">kg</option><option value="lb">lb</option><option value="ml">ml</option><option value="oz">oz</option><option value="tbsp">tbsp</option><option value="tsp">tsp</option><option value="__custom__">custom</option>';
+  sel.selectedIndex=0;
+  const wrap=document.getElementById('_unitWrap');
+  if(wrap){wrap.parentNode.replaceChild(sel,wrap);}
+  else{el.parentNode.replaceChild(sel,el);}
 }
 function getUnitValue(id){
   const el=document.getElementById(id);
@@ -535,14 +550,12 @@ function getUnitValue(id){
   if(el.tagName==='SELECT')return el.value==='__custom__'?'':el.value;
   return el.value.trim();
 }
-// Set a unit field — if the value isn't in the preset list, switch to text input
 function setUnitValue(id,val){
   const el=document.getElementById(id);
   if(!el)return;
   if(el.tagName==='SELECT'){
     const presets=['','cup','g','kg','lb','ml','oz','tbsp','tsp'];
     if(presets.includes(val)){el.value=val;el.selectedIndex=val===''?0:el.selectedIndex;return;}
-    // not a preset — swap to text input
     const inp=document.createElement('input');
     inp.type='text';inp.id=id;inp.placeholder='unit';inp.autocomplete='off';
     inp.style.cssText=el.style.cssText;
@@ -552,24 +565,6 @@ function setUnitValue(id,val){
     el.value=val;
   }
 }
-// Reset a unit field back to the select (called on modal close/reset)
-function resetUnitSelect(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  // if it's already a select, just reset to index 0
-  if(el.tagName==='SELECT'){el.selectedIndex=0;return;}
-  // it's a text input inside a wrapper div — replace the whole wrapper
-  const parent=el.parentNode;
-  const container=parent.tagName==='DIV'&&parent.style.position==='relative'?parent:el;
-  const sel=document.createElement('select');
-  sel.id=id;sel.onchange=function(){onUnitChange(this);};
-  sel.style.cssText=el.style.cssText;
-  sel.style.paddingRight='';
-  sel.innerHTML='<option value="">—</option><option value="cup">cup</option><option value="g">g</option><option value="kg">kg</option><option value="lb">lb</option><option value="ml">ml</option><option value="oz">oz</option><option value="tbsp">tbsp</option><option value="tsp">tsp</option><option value="__custom__">custom</option>';
-  sel.selectedIndex=0;
-  container.parentNode.replaceChild(sel,container);
-}
-// ── Storage ──────────────────────────────────────────
 const DB = {
   get entries(){ try{return JSON.parse(localStorage.getItem('fl_entries')||'[]')}catch{return[]} },
   set entries(v){ localStorage.setItem('fl_entries',JSON.stringify(v)) },
