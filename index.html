@@ -71,13 +71,13 @@
 
   /* ── Entries ── */
   .entries { padding:0 20px; }
-  .entry { display:flex; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:11px 12px; margin-bottom:8px; gap:10px; animation:slideIn .2s ease; }
+  .entry { display:flex; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:11px 12px; margin-bottom:8px; gap:10px; animation:slideIn .2s ease; }
   @keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
   .entry-name { flex:1; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .entry-time { font-size:10px; color:var(--text); margin-top:2px; }
   .entry-info { text-align:right; flex-shrink:0; }
   .entry-cal { font-size:13px; color:var(--accent); font-weight:500; }
-  .entry-pro { font-size:11px; color:var(--accent2); }
+  .entry-pro { font-size:13px; color:var(--accent2); font-weight:500; }
   .entry-actions { display:flex; gap:6px; flex-shrink:0; }
   .icon-btn { background:none; border:1px solid var(--border); border-radius:8px; cursor:pointer; font-size:17px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
   .icon-btn.edit { color:var(--edit-col); border-color:var(--edit-col); background:rgba(182,146,123,.1); }
@@ -368,7 +368,18 @@
       <div class="form-row" style="grid-template-columns:1fr 1fr;align-items:end;">
         <div><label style="color:var(--tab-act);">SIZE</label><input type="text" id="inputSize" placeholder="0" style="border-color:var(--tab-act);"></div>
         <div><label style="color:var(--tab-act);">UNIT</label>
-          <input type="text" id="inputUnit" list="unitOptions" placeholder="—" autocomplete="off" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;">
+          <select id="inputUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
+            <option value="">—</option>
+            <option value="cup">cup</option>
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+            <option value="ml">ml</option>
+            <option value="oz">oz</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="__custom__">custom</option>
+          </select>
         </div>
       </div>
       <div id="qtyRow" style="display:flex;gap:10px;margin-bottom:10px;">
@@ -430,7 +441,18 @@
     <div class="form-row" style="grid-template-columns:1fr 1fr;">
       <div><label style="color:var(--text);">SIZE</label><input type="text" id="editSavedSize" placeholder="0" style="border-color:var(--tab-act);"></div>
       <div><label style="color:var(--text);">UNIT</label>
-        <input type="text" id="editSavedUnit" list="unitOptions" placeholder="—" autocomplete="off" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;">
+        <select id="editSavedUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
+            <option value="">—</option>
+            <option value="cup">cup</option>
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+            <option value="ml">ml</option>
+            <option value="oz">oz</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="__custom__">custom</option>
+          </select>
       </div>
     </div>
     <div class="form-actions">
@@ -453,7 +475,18 @@
     <div class="form-row" style="grid-template-columns:1fr 1fr;flex-shrink:0;margin-top:10px;">
       <div><label style="color:var(--text);">SIZE</label><input type="text" id="comboSize" placeholder="0" style="border-color:var(--tab-act);"></div>
       <div><label style="color:var(--text);">UNIT</label>
-        <input type="text" id="comboUnit" list="unitOptions" placeholder="—" autocomplete="off" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;">
+        <select id="comboUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
+            <option value="">—</option>
+            <option value="cup">cup</option>
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+            <option value="ml">ml</option>
+            <option value="oz">oz</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="__custom__">custom</option>
+          </select>
       </div>
     </div>
     <div style="font-size:10px;letter-spacing:1.5px;color:var(--text);text-align:center;margin-top:8px;margin-bottom:4px;">FINAL TOTALS</div>
@@ -471,6 +504,56 @@
 </div>
 
 <script>
+// ── Unit select helpers ───────────────────────────────
+function onUnitChange(sel){
+  if(sel.value!=='__custom__')return;
+  // swap the select for a text input in place
+  const inp=document.createElement('input');
+  inp.type='text';
+  inp.id=sel.id;
+  inp.placeholder='unit';
+  inp.autocomplete='off';
+  inp.style.cssText=sel.style.cssText;
+  inp.style.borderColor='var(--tab-act)';
+  sel.parentNode.replaceChild(inp,sel);
+  inp.focus();
+}
+// Read the real value from either a select or a custom text input
+function getUnitValue(id){
+  const el=document.getElementById(id);
+  if(!el)return'';
+  if(el.tagName==='SELECT')return el.value==='__custom__'?'':el.value;
+  return el.value.trim();
+}
+// Set a unit field — if the value isn't in the preset list, switch to text input
+function setUnitValue(id,val){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el.tagName==='SELECT'){
+    const presets=['','cup','g','kg','lb','ml','oz','tbsp','tsp'];
+    if(presets.includes(val)){el.value=val;el.selectedIndex=val===''?0:el.selectedIndex;return;}
+    // not a preset — swap to text input
+    const inp=document.createElement('input');
+    inp.type='text';inp.id=id;inp.placeholder='unit';inp.autocomplete='off';
+    inp.style.cssText=el.style.cssText;
+    inp.value=val;
+    el.parentNode.replaceChild(inp,el);
+  } else {
+    el.value=val;
+  }
+}
+// Reset a unit field back to the select (called on modal close/reset)
+function resetUnitSelect(id){
+  const el=document.getElementById(id);
+  if(el&&el.tagName==='SELECT'){el.selectedIndex=0;return;}
+  if(!el||el.tagName==='SELECT')return;
+  const sel=document.createElement('select');
+  sel.id=id;sel.onchange=function(){onUnitChange(this);};
+  sel.style.cssText=el.style.cssText;
+  sel.innerHTML='<option value="">—</option><option value="cup">cup</option><option value="g">g</option><option value="kg">kg</option><option value="lb">lb</option><option value="ml">ml</option><option value="oz">oz</option><option value="tbsp">tbsp</option><option value="tsp">tsp</option><option value="__custom__">custom</option>';
+  sel.selectedIndex=0;
+  el.parentNode.replaceChild(sel,el);
+}
 // ── Storage ──────────────────────────────────────────
 const DB = {
   get entries(){ try{return JSON.parse(localStorage.getItem('fl_entries')||'[]')}catch{return[]} },
@@ -502,8 +585,8 @@ let pendingComboUnit  = '';
 const TZ           = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const todayStr     = () => new Date().toLocaleDateString('en-CA',{timeZone:TZ});
 const esc          = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const nameSize     = s => { const sz=(s.size&&s.unit)?s.size+s.unit:s.size||''; return esc(s.name)+(sz?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(sz)})</span>`:''); };
-const fmtTime      = ts => new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const nameSize     = s => { const sz=(s.size&&s.unit)?s.size+' '+s.unit:s.size||''; return esc(s.name)+(sz?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(sz)})</span>`:''); };
+const fmtTime      = ts => new Date(ts).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
 
 function localDateStr(d){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -591,14 +674,16 @@ function render(){
 function renderEntry(e, deleteHandler, showDate=true){
   const uid='entry'+e.ts;
   const hasCombo=e.comboItems&&e.comboItems.length;
-  const timeStr=fmtTime(e.ts)+(showDate&&e.date?' · '+e.date:'');
+  const timeStr=fmtTime(e.ts);
 
   const mainRow=
     '<div style="flex:1;min-width:0;">'
-    +'<div class="entry-name">'+esc(e.name)+(()=>{const sz=(e.comboSize&&e.comboUnit)?e.comboSize+e.comboUnit:e.comboSize||'';return sz?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(sz)})</span>`:''})()+'</div>'
+    +'<div class="entry-name">'+esc(e.name)+(()=>{const sz=(e.comboSize&&e.comboUnit)?e.comboSize+' '+e.comboUnit:(e.comboSize||'');const rsz=(e.size&&e.unit)?e.size+' '+e.unit:(e.size||'');const display=sz||rsz;const qty=(e.servings&&e.servings!==1)?` <span style="color:var(--qty-col);font-size:0.9em;">x${e.servings}</span>`:'';return display?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(display)})</span>${qty}`:qty;})()+'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">'
     +'<div class="entry-time">'+timeStr+'</div>'
+    +'<div style="text-align:right;"><span class="entry-cal">'+e.cal+' kcal</span> <span style="color:var(--muted)">|</span> <span class="entry-pro">'+e.pro+' g</span></div>'
     +'</div>'
-    +'<div class="entry-info"><div class="entry-cal">'+e.cal+' kcal</div><div class="entry-pro">'+e.pro+' g</div></div>'
+    +'</div>'
     +'<div class="entry-actions"'+(hasCombo?' onclick="event.stopPropagation()"':'')+'>'
     +'<button class="icon-btn edit" onclick="openEditLogModal('+e.ts+')">✎</button>'
     +'<button class="icon-btn del" onclick="'+deleteHandler+'('+e.ts+')">×</button>'
@@ -610,9 +695,9 @@ function renderEntry(e, deleteHandler, showDate=true){
 
   const itemLines=[...e.comboItems].sort((a,b)=>a.name.localeCompare(b.name)).map(it=>
     '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;gap:8px;">'
-    +'<span style="font-size:12px;color:var(--text);">'+nameSize(it)+'</span>'
+    +'<span style="font-size:12px;color:var(--text);">'+nameSize(it)+' <span style="color:var(--qty-col);font-size:0.9em;">x'+it.qty+'</span></span>'
     +'<span style="font-size:11px;white-space:nowrap;flex-shrink:0;">'
-    +'<span style="color:var(--qty-col)">['+it.qty+']</span><span style="color:var(--text)"> x </span><span style="color:var(--accent)">'+it.cal+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+it.pro+' g</span>':'')
+    +'<span style="color:var(--accent)">'+it.cal+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+it.pro+' g</span>':'')
     +'</span></div>'
   ).join('');
 
@@ -695,7 +780,7 @@ function openAddModal(){
   document.getElementById('inputPro').value='';
   document.getElementById('inputServings').value='1';
   document.getElementById('inputSize').value='';
-  document.getElementById('inputUnit').value='';
+  resetUnitSelect('inputUnit');
   document.getElementById('saveItem').checked=false;
   document.getElementById('saveItemSlider').style.transform='translateX(-100%)';
   document.getElementById('saveItemSlider').style.opacity='0';
@@ -735,8 +820,8 @@ function openEditLogModal(ts){
   document.getElementById('inputCal').value=e.baseCal!==undefined?e.baseCal:e.cal;
   document.getElementById('inputPro').value=e.basePro!==undefined?e.basePro:e.pro;
   document.getElementById('inputServings').value=e.servings!==undefined?e.servings:'1';
-  document.getElementById('inputSize').value='';
-  document.getElementById('inputUnit').value='';
+  document.getElementById('inputSize').value=e.size||'';
+  setUnitValue('inputUnit',e.unit||'');
   // clear any readOnly/opacity from combo tab
   ['inputName','inputCal','inputPro'].forEach(id=>{
     const el=document.getElementById(id);
@@ -766,7 +851,9 @@ function submitLogForm(){
   if(editingLogTs!==null){
     const baseCal=parseInt(document.getElementById('inputCal').value)||0;
     const basePro=parseInt(document.getElementById('inputPro').value)||0;
-    DB.entries=DB.entries.map(e=>e.ts===editingLogTs?{...e,name,cal,pro,baseCal,basePro,servings}:e);
+    const editSize=document.getElementById('inputSize').value.trim();
+    const editUnit=getUnitValue('inputUnit');
+    DB.entries=DB.entries.map(e=>e.ts===editingLogTs?{...e,name,cal,pro,baseCal,basePro,servings,size:editSize,unit:editUnit}:e);
   } else {
     const entryDate=historyOpen?historyDate:todayStr();
     let entryTs=Date.now();
@@ -774,10 +861,12 @@ function submitLogForm(){
     const comboItems=pendingComboItems||null;
     const comboSize=pendingComboSize||'';
     const comboUnit=pendingComboUnit||'';
+    const entrySize=document.getElementById('inputSize').value.trim();
+    const entryUnit=getUnitValue('inputUnit');
     pendingComboItems=null;
     pendingComboSize='';
     pendingComboUnit='';
-    DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,date:entryDate,ts:entryTs,...(comboItems?{comboItems,comboSize,comboUnit}:{})},...DB.entries];
+    DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,size:entrySize,unit:entryUnit,date:entryDate,ts:entryTs,...(comboItems?{comboItems,comboSize,comboUnit}:{})},...DB.entries];
     if(document.getElementById('saveItem').checked){
       const saved=DB.saved;
       if(!saved.find(s=>s.name.toLowerCase()===name.toLowerCase())){
@@ -1065,7 +1154,7 @@ function openNewSavedModal(){
   document.getElementById('editSavedCal').value='';
   document.getElementById('editSavedPro').value='';
   document.getElementById('editSavedSize').value='';
-  document.getElementById('editSavedUnit').value='';
+  resetUnitSelect('editSavedUnit');
   openModal('editSavedBg');
   setTimeout(()=>document.getElementById('editSavedName').focus(),120);
 }
@@ -1082,7 +1171,7 @@ function openEditSavedModal(i){
   document.getElementById('editSavedCal').value=s.cal;
   document.getElementById('editSavedPro').value=s.pro;
   document.getElementById('editSavedSize').value=s.size||'';
-  document.getElementById('editSavedUnit').value=s.unit||'';
+  setUnitValue('editSavedUnit',s.unit||'');
   openModal('editSavedBg');
   setTimeout(()=>document.getElementById('editSavedName').focus(),120);
 }
@@ -1092,7 +1181,7 @@ function saveEditedSaved(){
   const cal=parseInt(document.getElementById('editSavedCal').value)||0;
   const pro=parseInt(document.getElementById('editSavedPro').value)||0;
   const size=document.getElementById('editSavedSize').value.trim();
-  const unit=document.getElementById('editSavedUnit').value;
+  const unit=getUnitValue('editSavedUnit');
   if(!name){document.getElementById('editSavedName').focus();return;}
   const saved=DB.saved;
   const sizeStr=size&&unit?size+' '+unit:size||'';
@@ -1163,9 +1252,9 @@ function renderManageCombos(){
     const totalPro=Math.floor(combo.items.reduce((s,it)=>s+it.pro*it.qty,0));
     const itemLines=[...combo.items].sort((a,b)=>a.name.localeCompare(b.name)).map(it=>
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;gap:8px;">'
-      +'<span style="font-size:12px;color:var(--text);">'+nameSize(it)+'</span>'
+      +'<span style="font-size:12px;color:var(--text);">'+nameSize(it)+' <span style="color:var(--qty-col);font-size:0.9em;">x'+it.qty+'</span></span>'
       +'<span style="font-size:11px;white-space:nowrap;flex-shrink:0;">'
-      +'<span style="color:var(--qty-col)">['+it.qty+']</span><span style="color:var(--text)"> x </span><span style="color:var(--accent)">'+(it.qty!==1?it.cal:Math.ceil(it.cal))+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+(it.qty!==1?it.pro:Math.floor(it.pro))+' g</span>':'')
+      +'<span style="color:var(--accent)">'+(it.qty!==1?it.cal:Math.ceil(it.cal))+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+(it.qty!==1?it.pro:Math.floor(it.pro))+' g</span>':'')
       +'</span>'
       +'</div>'
     ).join('');
@@ -1221,7 +1310,7 @@ function openComboModal(idx){
   document.getElementById('saveComboBtn').style.borderColor=comboColor;
   document.getElementById('comboName').value=combo?combo.name:'';
   document.getElementById('comboSize').value=combo&&combo.size?combo.size:'';
-  document.getElementById('comboUnit').value=combo&&combo.unit?combo.unit:'';
+  setUnitValue('comboUnit',combo&&combo.unit?combo.unit:'');
   const saved=DB.saved;
   if(!saved.length){showToast('Add some Quick items first!');return;}
   const list=document.getElementById('comboItemList');
@@ -1287,7 +1376,7 @@ function saveCombo(){
   const name=document.getElementById('comboName').value.trim();
   if(!name){document.getElementById('comboName').focus();return;}
   const size=document.getElementById('comboSize').value.trim();
-  const unit=document.getElementById('comboUnit').value;
+  const unit=getUnitValue('comboUnit');
   const sizeStr=size&&unit?size+' '+unit:size||'';
   const saved=DB.saved;
   const items=[];
@@ -1627,15 +1716,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<datalist id="unitOptions">
-  <option value="cup">
-  <option value="g">
-  <option value="kg">
-  <option value="lb">
-  <option value="ml">
-  <option value="oz">
-  <option value="tbsp">
-  <option value="tsp">
-</datalist>
+
 </body>
 </html>
