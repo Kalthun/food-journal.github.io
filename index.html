@@ -129,6 +129,7 @@
   .modal h2 { font-family:'DM Mono',monospace;font-size:18px;font-weight:500;margin-bottom:14px;flex-shrink:0;text-align:center;letter-spacing:1px; }
 
   /* Log modal layout */
+  #logModalBg .modal { overflow-y: auto; max-height: calc(100vh - 48px); height: calc(100vh - 48px); }
   #logModalBg .modal #savedListWrap { flex:1 1 0;min-height:0;display:flex;flex-direction:column;overflow:hidden; }
   #logModalBg .modal #savedListWrap .saved-list { flex:1 1 0;overflow-y:auto;min-height:0;margin-bottom:8px; }
   #logModalBg .modal .log-form-section { flex:0 0 auto;display:flex;flex-direction:column; }
@@ -642,16 +643,12 @@ function showLogDetails(){
   // clear any chip highlight
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   updateServingPreview();
-  // scroll name input to top of modal so it stays visible above keyboard
+  // scroll modal so name input stays visible
   setTimeout(()=>{
     const modal=document.getElementById('logModal');
     const nameEl=document.getElementById('inputName');
-    if(modal&&nameEl){
-      modal.style.overflowY='auto';
-      nameEl.scrollIntoView({behavior:'smooth',block:'start'});
-      setTimeout(()=>modal.style.overflowY='',500);
-    }
-  },80);
+    if(modal&&nameEl) modal.scrollTop=nameEl.offsetTop-modal.offsetTop-8;
+  },50);
 }
 function onLogNameInput(){
   document.getElementById('inputName').closest('.form-row').style.display='';
@@ -792,6 +789,9 @@ function closeLogModal(){
   editingLogTs=null;
   pendingComboItems=null;
   document.getElementById('logModal').classList.remove('auto-height');
+  document.getElementById('logModal').style.maxHeight='';
+  document.getElementById('logModal').style.height='';
+  document.getElementById('logModal').scrollTop=0;
   document.getElementById('inputServings').value='1';
   document.getElementById('logDivider').style.display='';
 }
@@ -883,6 +883,23 @@ function setLogTab(tab){
 }
 
 // ── Saved Chips ───────────────────────────────────────
+function scrollChipToBottom(chip){
+  const list=document.getElementById('savedList');
+  if(!list||!chip)return;
+  list.style.paddingTop='';
+  list.style.paddingBottom='';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const listH=list.clientHeight;
+    const chipH=chip.offsetHeight;
+    const targetScroll=chip.offsetTop+chipH-listH+6-(chipH+6)*2;
+    const pad=Math.max(0,-targetScroll);
+    list.style.paddingTop=pad+'px';
+    requestAnimationFrame(()=>{
+      list.scrollTop=chip.offsetTop+chipH-listH+6-(chipH+6)*2;
+    });
+  }));
+}
+
 function renderSavedChips(){
   const saved=DB.saved,combos=DB.combos;
   const el=document.getElementById('savedList');
@@ -953,11 +970,9 @@ function quickAdd(i){
   document.getElementById('inputCal').value=s.cal;
   document.getElementById('inputPro').value=s.pro;
   document.getElementById('inputServings').value='1';
-  // highlight selected chip, clear others
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   const chip=document.getElementById('qchip'+i);
   if(chip) chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
-  // hide name, cal/pro, size/unit, save toggle — keep qty and preview
   document.getElementById('inputName').closest('.form-row').style.display='none';
   document.getElementById('logDivider').style.display='none';
   document.getElementById('macroRow').style.display='none';
@@ -965,18 +980,7 @@ function quickAdd(i){
   document.getElementById('saveNewRow').style.display='none';
   document.getElementById('logDetailsWrap').style.display='';
   updateServingPreview();
-  // reset padding first, then measure and scroll in next frame
-  const list=document.getElementById('savedList');
-  if(list){list.style.paddingTop='';list.style.paddingBottom='';}
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if(!chip)return;
-    const list=document.getElementById('savedList');
-    if(!list)return;
-    const gap=Math.max(0,list.clientHeight-chip.offsetHeight-6);
-    list.style.paddingTop=gap+'px';
-    list.style.paddingBottom=gap+'px';
-    list.scrollTop=(chip.offsetTop-list.offsetTop)-gap;
-  }));
+  scrollChipToBottom(chip);
 }
 
 function toggleLogCombo(uid){
@@ -1029,7 +1033,6 @@ function quickAddCombo(i){
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   const chip=document.getElementById('cchip'+i);
   if(chip) chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
-  // show only qty + preview, hide everything else
   document.getElementById('inputName').closest('.form-row').style.display='none';
   document.getElementById('logDivider').style.display='none';
   document.getElementById('macroRow').style.display='none';
@@ -1037,17 +1040,7 @@ function quickAddCombo(i){
   document.getElementById('saveNewRow').style.display='none';
   document.getElementById('logDetailsWrap').style.display='';
   updateServingPreview();
-  const listC=document.getElementById('savedList');
-  if(listC){listC.style.paddingTop='';listC.style.paddingBottom='';}
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if(!chip)return;
-    const list=document.getElementById('savedList');
-    if(!list)return;
-    const gap=Math.max(0,list.clientHeight-chip.offsetHeight-6);
-    list.style.paddingTop=gap+'px';
-    list.style.paddingBottom=gap+'px';
-    list.scrollTop=(chip.offsetTop-list.offsetTop)-gap;
-  }));
+  scrollChipToBottom(chip);
 }
 
 // ── Saved Item CRUD ───────────────────────────────────
@@ -1423,21 +1416,26 @@ function closeConfirm(){closeModal('confirmDeleteBg');_confirmCallback=null;}
 // ── Modal helpers ─────────────────────────────────────
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
 
-// Keep focused input visible when iOS keyboard pushes layout
-if(window.visualViewport){
-  window.visualViewport.addEventListener('resize',()=>{
+// Resize log modal when iOS keyboard appears so inputs stay visible
+function onViewportResize(){
+  const modal=document.getElementById('logModal');
+  if(!modal)return;
+  const vv=window.visualViewport;
+  const availH=vv?vv.height:window.innerHeight;
+  const modalBg=document.getElementById('logModalBg');
+  if(modalBg&&modalBg.classList.contains('open')){
+    modal.style.maxHeight=(availH-48)+'px';
+    modal.style.height=(availH-48)+'px';
+    // scroll active input into view inside modal
     const el=document.activeElement;
-    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA')){
-      const modal=el.closest('.modal');
-      if(modal){
-        modal.style.overflowY='auto';
-        setTimeout(()=>{
-          el.scrollIntoView({behavior:'smooth',block:'center'});
-          setTimeout(()=>modal.style.overflowY='',400);
-        },50);
-      }
+    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA')&&el.closest('#logModal')){
+      setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),50);
     }
-  });
+  }
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', onViewportResize);
+  window.visualViewport.addEventListener('scroll', onViewportResize);
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 function closeModalOutside(e,id){
