@@ -642,17 +642,16 @@ function showLogDetails(){
   // clear any chip highlight
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   updateServingPreview();
-  // scroll name input back into view after details push it up
+  // scroll name input to top of modal so it stays visible above keyboard
   setTimeout(()=>{
-    const nameEl=document.getElementById('inputName');
     const modal=document.getElementById('logModal');
-    if(nameEl&&modal){
-      // make modal temporarily scrollable to reach the input
+    const nameEl=document.getElementById('inputName');
+    if(modal&&nameEl){
       modal.style.overflowY='auto';
-      nameEl.scrollIntoView({behavior:'smooth',block:'center'});
-      setTimeout(()=>modal.style.overflowY='',400);
+      nameEl.scrollIntoView({behavior:'smooth',block:'start'});
+      setTimeout(()=>modal.style.overflowY='',500);
     }
-  },50);
+  },80);
 }
 function onLogNameInput(){
   document.getElementById('inputName').closest('.form-row').style.display='';
@@ -855,7 +854,7 @@ function setLogTab(tab){
   if(savedList){
     savedList.style.overflow='hidden';
     savedList.scrollTop=0;
-    savedList.style.paddingBottom='';
+    savedList.style.paddingBottom='';savedList.style.paddingTop='';
     requestAnimationFrame(()=>{ savedList.style.overflow=''; });
   }
   const sizeRow=document.querySelector('#logDetailsWrap .form-row:nth-child(2)');
@@ -940,7 +939,7 @@ function quickAdd(i){
     document.getElementById('logDetailsWrap').style.display='none';
     document.getElementById('saveNewRow').style.display='';
     const list=document.getElementById('savedList');
-    if(list){list.style.paddingBottom='';}
+    if(list){list.style.paddingBottom='';list.style.paddingTop='';}
     renderSavedChips();
     requestAnimationFrame(()=>{
       const list=document.getElementById('savedList');
@@ -957,15 +956,7 @@ function quickAdd(i){
   // highlight selected chip, clear others
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   const chip=document.getElementById('qchip'+i);
-  if(chip){
-    chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
-    const list=document.getElementById('savedList');
-    if(list){
-      const halfList=list.clientHeight/2;
-      list.style.paddingBottom=Math.max(0,halfList-(chip.offsetHeight/2))+'px';
-      list.scrollTop=(chip.offsetTop-list.offsetTop)-halfList+(chip.offsetHeight/2);
-    }
-  }
+  if(chip) chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
   // hide name, cal/pro, size/unit, save toggle — keep qty and preview
   document.getElementById('inputName').closest('.form-row').style.display='none';
   document.getElementById('logDivider').style.display='none';
@@ -974,6 +965,18 @@ function quickAdd(i){
   document.getElementById('saveNewRow').style.display='none';
   document.getElementById('logDetailsWrap').style.display='';
   updateServingPreview();
+  // reset padding first, then measure and scroll in next frame
+  const list=document.getElementById('savedList');
+  if(list){list.style.paddingTop='';list.style.paddingBottom='';}
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(!chip)return;
+    const list=document.getElementById('savedList');
+    if(!list)return;
+    const gap=Math.max(0,list.clientHeight-chip.offsetHeight-6);
+    list.style.paddingTop=gap+'px';
+    list.style.paddingBottom=gap+'px';
+    list.scrollTop=(chip.offsetTop-list.offsetTop)-gap;
+  }));
 }
 
 function toggleLogCombo(uid){
@@ -1007,7 +1010,7 @@ function quickAddCombo(i){
     pendingComboUnit='';
     document.getElementById('logDetailsWrap').style.display='none';
     const list=document.getElementById('savedList');
-    if(list){list.style.paddingBottom='';}
+    if(list){list.style.paddingBottom='';list.style.paddingTop='';}
     renderSavedChips();
     return;
   }
@@ -1025,16 +1028,7 @@ function quickAddCombo(i){
   // highlight selected chip, clear others
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   const chip=document.getElementById('cchip'+i);
-  if(chip){
-    chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
-    const list=document.getElementById('savedList');
-    if(list){
-      const itemH=chip.offsetHeight+6;
-      const halfList=list.clientHeight/2;
-      list.style.paddingBottom=Math.max(0,halfList-(chip.offsetHeight/2))+'px';
-      list.scrollTop=(chip.offsetTop-list.offsetTop)-(halfList)+(chip.offsetHeight/2);
-    }
-  }
+  if(chip) chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
   // show only qty + preview, hide everything else
   document.getElementById('inputName').closest('.form-row').style.display='none';
   document.getElementById('logDivider').style.display='none';
@@ -1043,6 +1037,17 @@ function quickAddCombo(i){
   document.getElementById('saveNewRow').style.display='none';
   document.getElementById('logDetailsWrap').style.display='';
   updateServingPreview();
+  const listC=document.getElementById('savedList');
+  if(listC){listC.style.paddingTop='';listC.style.paddingBottom='';}
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(!chip)return;
+    const list=document.getElementById('savedList');
+    if(!list)return;
+    const gap=Math.max(0,list.clientHeight-chip.offsetHeight-6);
+    list.style.paddingTop=gap+'px';
+    list.style.paddingBottom=gap+'px';
+    list.scrollTop=(chip.offsetTop-list.offsetTop)-gap;
+  }));
 }
 
 // ── Saved Item CRUD ───────────────────────────────────
