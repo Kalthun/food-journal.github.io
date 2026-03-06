@@ -867,8 +867,14 @@ function setLogTab(tab){
   document.getElementById('logDetailsWrap').style.display='none';
   document.getElementById('macroRow').style.display='';
   // reset list scroll immediately to prevent empty list bug
+  // kill any momentum scroll instantly before re-rendering
   const savedList=document.getElementById('savedList');
-  if(savedList) savedList.scrollTop=0;
+  if(savedList){
+    savedList.style.overflow='hidden';
+    savedList.scrollTop=0;
+    savedList.style.paddingBottom='';
+    requestAnimationFrame(()=>{ savedList.style.overflow=''; });
+  }
   const sizeRow=document.querySelector('#logDetailsWrap .form-row:nth-child(2)');
   if(sizeRow)sizeRow.style.display='';
   const isCombo=tab==='combo';
@@ -943,7 +949,6 @@ function quickAdd(i){
   // deselect if tapping same item
   if(selectedQuickIdx===i){
     selectedQuickIdx=null;
-    document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
     document.getElementById('inputName').value='';
     document.getElementById('inputCal').value='';
     document.getElementById('inputPro').value='';
@@ -951,6 +956,9 @@ function quickAdd(i){
     document.getElementById('inputName').closest('.form-row').style.display='';
     document.getElementById('logDetailsWrap').style.display='none';
     document.getElementById('saveNewRow').style.display='';
+    const list=document.getElementById('savedList');
+    if(list){list.style.paddingBottom='';}
+    renderSavedChips();
     return;
   }
   selectedQuickIdx=i;
@@ -964,9 +972,12 @@ function quickAdd(i){
   const chip=document.getElementById('qchip'+i);
   if(chip){
     chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
-    // scroll selected item to top
     const list=document.getElementById('savedList');
-    if(list) list.scrollTop=chip.offsetTop-list.offsetTop;
+    if(list){
+      const itemH=chip.offsetHeight+6; // height + gap
+      list.style.paddingBottom=Math.max(0,list.clientHeight-itemH)+'px';
+      list.scrollTop=chip.offsetTop-list.offsetTop;
+    }
   }
   // hide name, cal/pro, size/unit, save toggle — keep qty and preview
   document.getElementById('inputName').closest('.form-row').style.display='none';
@@ -1000,7 +1011,6 @@ function quickAddCombo(i){
   // deselect if tapping same item
   if(selectedComboIdx===i){
     selectedComboIdx=null;
-    document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
     document.getElementById('inputName').value='';
     document.getElementById('inputCal').value='';
     document.getElementById('inputPro').value='';
@@ -1009,6 +1019,9 @@ function quickAddCombo(i){
     pendingComboSize='';
     pendingComboUnit='';
     document.getElementById('logDetailsWrap').style.display='none';
+    const list=document.getElementById('savedList');
+    if(list){list.style.paddingBottom='';}
+    renderSavedChips();
     return;
   }
   selectedComboIdx=i;
@@ -1028,7 +1041,11 @@ function quickAddCombo(i){
   if(chip){
     chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
     const list=document.getElementById('savedList');
-    if(list) list.scrollTop=chip.offsetTop-list.offsetTop;
+    if(list){
+      const itemH=chip.offsetHeight+6;
+      list.style.paddingBottom=Math.max(0,list.clientHeight-itemH)+'px';
+      list.scrollTop=chip.offsetTop-list.offsetTop;
+    }
   }
   // show only qty + preview, hide everything else
   document.getElementById('inputName').closest('.form-row').style.display='none';
