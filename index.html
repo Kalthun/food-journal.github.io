@@ -866,6 +866,9 @@ function setLogTab(tab){
   document.getElementById('inputServings').value='1';
   document.getElementById('logDetailsWrap').style.display='none';
   document.getElementById('macroRow').style.display='';
+  // reset list scroll immediately to prevent empty list bug
+  const savedList=document.getElementById('savedList');
+  if(savedList) savedList.scrollTop=0;
   const sizeRow=document.querySelector('#logDetailsWrap .form-row:nth-child(2)');
   if(sizeRow)sizeRow.style.display='';
   const isCombo=tab==='combo';
@@ -961,6 +964,9 @@ function quickAdd(i){
   const chip=document.getElementById('qchip'+i);
   if(chip){
     chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
+    // scroll selected item to top
+    const list=document.getElementById('savedList');
+    if(list) list.scrollTop=chip.offsetTop-list.offsetTop;
   }
   // hide name, cal/pro, size/unit, save toggle — keep qty and preview
   document.getElementById('inputName').closest('.form-row').style.display='none';
@@ -1021,6 +1027,8 @@ function quickAddCombo(i){
   const chip=document.getElementById('cchip'+i);
   if(chip){
     chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
+    const list=document.getElementById('savedList');
+    if(list) list.scrollTop=chip.offsetTop-list.offsetTop;
   }
   // show only qty + preview, hide everything else
   document.getElementById('inputName').closest('.form-row').style.display='none';
