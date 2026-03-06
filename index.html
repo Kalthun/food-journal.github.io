@@ -507,7 +507,6 @@
 // ── Unit select helpers ───────────────────────────────
 function onUnitChange(sel){
   if(sel.value!=='__custom__')return;
-  // swap the select for a text input in place
   const inp=document.createElement('input');
   inp.type='text';
   inp.id=sel.id;
@@ -515,10 +514,21 @@ function onUnitChange(sel){
   inp.autocomplete='off';
   inp.style.cssText=sel.style.cssText;
   inp.style.borderColor='var(--tab-act)';
-  sel.parentNode.replaceChild(inp,sel);
+  // wrap in a relative container with a reset button
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;display:flex;align-items:center;';
+  inp.style.paddingRight='28px';
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.textContent='×';
+  btn.title='Back to list';
+  btn.style.cssText='position:absolute;right:8px;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0;line-height:1;';
+  btn.onclick=()=>resetUnitSelect(sel.id);
+  wrap.appendChild(inp);
+  wrap.appendChild(btn);
+  sel.parentNode.replaceChild(wrap,sel);
   inp.focus();
 }
-// Read the real value from either a select or a custom text input
 function getUnitValue(id){
   const el=document.getElementById(id);
   if(!el)return'';
@@ -545,14 +555,19 @@ function setUnitValue(id,val){
 // Reset a unit field back to the select (called on modal close/reset)
 function resetUnitSelect(id){
   const el=document.getElementById(id);
-  if(el&&el.tagName==='SELECT'){el.selectedIndex=0;return;}
-  if(!el||el.tagName==='SELECT')return;
+  if(!el)return;
+  // if it's already a select, just reset to index 0
+  if(el.tagName==='SELECT'){el.selectedIndex=0;return;}
+  // it's a text input inside a wrapper div — replace the whole wrapper
+  const parent=el.parentNode;
+  const container=parent.tagName==='DIV'&&parent.style.position==='relative'?parent:el;
   const sel=document.createElement('select');
   sel.id=id;sel.onchange=function(){onUnitChange(this);};
   sel.style.cssText=el.style.cssText;
+  sel.style.paddingRight='';
   sel.innerHTML='<option value="">—</option><option value="cup">cup</option><option value="g">g</option><option value="kg">kg</option><option value="lb">lb</option><option value="ml">ml</option><option value="oz">oz</option><option value="tbsp">tbsp</option><option value="tsp">tsp</option><option value="__custom__">custom</option>';
   sel.selectedIndex=0;
-  el.parentNode.replaceChild(sel,el);
+  container.parentNode.replaceChild(sel,container);
 }
 // ── Storage ──────────────────────────────────────────
 const DB = {
