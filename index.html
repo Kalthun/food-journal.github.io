@@ -1592,8 +1592,6 @@ document.addEventListener('keydown',e=>{
 });
 
 // ── iOS keyboard: keep log modal locked in place ───────
-// visualViewport fires when the soft keyboard appears/disappears.
-// We pin the modal-bg to the real viewport top/height so it never shrinks.
 if(window.visualViewport){
   let _vpRaf=null;
   function _lockLogModal(){
@@ -1603,15 +1601,7 @@ if(window.visualViewport){
     bg.style.top=vp.offsetTop+'px';
     bg.style.height=vp.height+'px';
     bg.style.position='fixed';
-    // scroll the name input into view inside the modal if needed
-    const nameEl=document.getElementById('inputName');
-    const modal=document.getElementById('logModal');
-    if(nameEl&&modal){
-      const nameBottom=nameEl.offsetTop+nameEl.offsetHeight;
-      if(nameBottom>modal.scrollTop+modal.clientHeight){
-        modal.scrollTop=nameBottom-modal.clientHeight+12;
-      }
-    }
+    document.getElementById('logModal').scrollTop=0;
   }
   function _onVPChange(){
     if(_vpRaf)cancelAnimationFrame(_vpRaf);
