@@ -148,21 +148,21 @@
   .saved-chip.normal.over-limit:hover .chip-item-name { color:var(--danger) !important; }
   .saved-chip.over-limit { border-color:var(--danger)!important;color:var(--danger); }
   .saved-chip.normal.chip-selected:hover,
-  .saved-chip.normal.chip-selected { border-color:var(--streak) !important; }
+  .saved-chip.normal.chip-selected { border-color:var(--history-col) !important; }
   .saved-chip.normal.chip-selected:hover .chip-item-name,
-  .saved-chip.normal.chip-selected .chip-item-name { color:var(--streak) !important; }
+  .saved-chip.normal.chip-selected .chip-item-name { color:var(--history-col) !important; }
   .saved-chip.normal.chip-selected-over:hover,
-  .saved-chip.normal.chip-selected-over { border-color:var(--history-col) !important; }
+  .saved-chip.normal.chip-selected-over { border-color:var(--edit-col) !important; }
   .saved-chip.normal.chip-selected-over:hover .chip-item-name,
-  .saved-chip.normal.chip-selected-over .chip-item-name { color:var(--history-col) !important; }
+  .saved-chip.normal.chip-selected-over .chip-item-name { color:var(--edit-col) !important; }
   .saved-chip.combo-chip.chip-selected:hover,
-  .saved-chip.combo-chip.chip-selected { border-color:var(--streak) !important; }
+  .saved-chip.combo-chip.chip-selected { border-color:var(--history-col) !important; }
   .saved-chip.combo-chip.chip-selected:hover .combo-chip-name,
-  .saved-chip.combo-chip.chip-selected .combo-chip-name { color:var(--streak) !important; }
+  .saved-chip.combo-chip.chip-selected .combo-chip-name { color:var(--history-col) !important; }
   .saved-chip.combo-chip.chip-selected-over:hover,
-  .saved-chip.combo-chip.chip-selected-over { border-color:var(--history-col) !important; }
+  .saved-chip.combo-chip.chip-selected-over { border-color:var(--edit-col) !important; }
   .saved-chip.combo-chip.chip-selected-over:hover .combo-chip-name,
-  .saved-chip.combo-chip.chip-selected-over .combo-chip-name { color:var(--history-col) !important; }
+  .saved-chip.combo-chip.chip-selected-over .combo-chip-name { color:var(--edit-col) !important; }
   .saved-chip.combo-chip:hover { border-color:var(--streak); }
   .saved-chip.combo-chip:hover .combo-chip-name { color:var(--streak); }
   .saved-chip.combo-chip.over-limit:hover { border-color:var(--danger); }
@@ -365,17 +365,7 @@
       <div class="form-row" style="grid-template-columns:1fr 1fr;align-items:end;">
         <div><label style="color:var(--tab-act);">SIZE</label><input type="text" id="inputSize" placeholder="0" style="border-color:var(--tab-act);"></div>
         <div><label style="color:var(--tab-act);">UNIT</label>
-          <select id="inputUnit" style="width:100%;text-align:center;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box;">
-            <option value="">—</option>
-            <option value="cup">cup</option>
-            <option value="g">g</option>
-            <option value="kg">kg</option>
-            <option value="lb">lb</option>
-            <option value="ml">ml</option>
-            <option value="oz">oz</option>
-            <option value="tbsp">tbsp</option>
-            <option value="tsp">tsp</option>
-          </select>
+          <input type="text" id="inputUnit" list="unitOptions" placeholder="—" autocomplete="off" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;">
         </div>
       </div>
       <div id="qtyRow" style="display:flex;gap:10px;margin-bottom:10px;">
@@ -437,17 +427,7 @@
     <div class="form-row" style="grid-template-columns:1fr 1fr;">
       <div><label style="color:var(--text);">SIZE</label><input type="text" id="editSavedSize" placeholder="0" style="border-color:var(--tab-act);"></div>
       <div><label style="color:var(--text);">UNIT</label>
-        <select id="editSavedUnit" style="width:100%;text-align:center;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box;">
-          <option value="">—</option>
-          <option value="cup">cup</option>
-          <option value="g">g</option>
-          <option value="kg">kg</option>
-          <option value="lb">lb</option>
-          <option value="ml">ml</option>
-          <option value="oz">oz</option>
-          <option value="tbsp">tbsp</option>
-          <option value="tsp">tsp</option>
-        </select>
+        <input type="text" id="editSavedUnit" list="unitOptions" placeholder="—" autocomplete="off" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;">
       </div>
     </div>
     <div class="form-actions">
@@ -470,17 +450,7 @@
     <div class="form-row" style="grid-template-columns:1fr 1fr;flex-shrink:0;margin-top:10px;">
       <div><label style="color:var(--text);">SIZE</label><input type="text" id="comboSize" placeholder="0" style="border-color:var(--tab-act);"></div>
       <div><label style="color:var(--text);">UNIT</label>
-        <select id="comboUnit" style="width:100%;text-align:center;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box;">
-          <option value="">—</option>
-          <option value="cup">cup</option>
-          <option value="g">g</option>
-          <option value="kg">kg</option>
-          <option value="lb">lb</option>
-          <option value="ml">ml</option>
-          <option value="oz">oz</option>
-          <option value="tbsp">tbsp</option>
-          <option value="tsp">tsp</option>
-        </select>
+        <input type="text" id="comboUnit" list="unitOptions" placeholder="—" autocomplete="off" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;">
       </div>
     </div>
     <div style="font-size:10px;letter-spacing:1.5px;color:var(--text);text-align:center;margin-top:8px;margin-bottom:4px;">FINAL TOTALS</div>
@@ -959,6 +929,10 @@ function quickAdd(i){
     const list=document.getElementById('savedList');
     if(list){list.style.paddingBottom='';}
     renderSavedChips();
+    requestAnimationFrame(()=>{
+      const list=document.getElementById('savedList');
+      if(list){list.style.transform='translateZ(0)';requestAnimationFrame(()=>{list.style.transform='';});}
+    });
     return;
   }
   selectedQuickIdx=i;
@@ -974,9 +948,9 @@ function quickAdd(i){
     chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
     const list=document.getElementById('savedList');
     if(list){
-      const itemH=chip.offsetHeight+6; // height + gap
-      list.style.paddingBottom=Math.max(0,list.clientHeight-itemH)+'px';
-      list.scrollTop=chip.offsetTop-list.offsetTop;
+      const halfList=list.clientHeight/2;
+      list.style.paddingBottom=Math.max(0,halfList-(chip.offsetHeight/2))+'px';
+      list.scrollTop=(chip.offsetTop-list.offsetTop)-halfList+(chip.offsetHeight/2);
     }
   }
   // hide name, cal/pro, size/unit, save toggle — keep qty and preview
@@ -1043,8 +1017,9 @@ function quickAddCombo(i){
     const list=document.getElementById('savedList');
     if(list){
       const itemH=chip.offsetHeight+6;
-      list.style.paddingBottom=Math.max(0,list.clientHeight-itemH)+'px';
-      list.scrollTop=chip.offsetTop-list.offsetTop;
+      const halfList=list.clientHeight/2;
+      list.style.paddingBottom=Math.max(0,halfList-(chip.offsetHeight/2))+'px';
+      list.scrollTop=(chip.offsetTop-list.offsetTop)-(halfList)+(chip.offsetHeight/2);
     }
   }
   // show only qty + preview, hide everything else
@@ -1429,6 +1404,16 @@ function closeConfirm(){closeModal('confirmDeleteBg');_confirmCallback=null;}
 
 // ── Modal helpers ─────────────────────────────────────
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+
+// Keep focused input visible when iOS keyboard pushes layout
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',()=>{
+    const el=document.activeElement;
+    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA')&&el.closest('.modal')){
+      setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),50);
+    }
+  });
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 function closeModalOutside(e,id){
   if(e.target!==document.getElementById(id))return;
@@ -1589,5 +1574,15 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<datalist id="unitOptions">
+  <option value="cup">
+  <option value="g">
+  <option value="kg">
+  <option value="lb">
+  <option value="ml">
+  <option value="oz">
+  <option value="tbsp">
+  <option value="tsp">
+</datalist>
 </body>
 </html>
