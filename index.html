@@ -135,38 +135,40 @@
 
   /* ── Chips ── */
   .saved-list { display:flex;flex-direction:column;gap:6px;margin-bottom:0; }
-  .saved-chip { background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;width:100%; }
+  .saved-chip { background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;width:100%;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none; }
   .chip-item-name { color:var(--text); }
   .chip-cal { color:var(--accent); }
   .chip-sep { color:var(--muted); }
   .chip-pro { color:var(--accent2); }
-  .saved-chip.normal:hover { border-color:var(--streak); }
-  .saved-chip.normal:hover .chip-item-name { color:var(--streak) !important; }
   .saved-chip.normal.over-limit { border-color:var(--danger) !important; }
   .saved-chip.normal.over-limit .chip-item-name { color:var(--danger) !important; }
-  .saved-chip.normal.over-limit:hover { border-color:var(--danger); }
-  .saved-chip.normal.over-limit:hover .chip-item-name { color:var(--danger) !important; }
   .saved-chip.over-limit { border-color:var(--danger)!important;color:var(--danger); }
-  .saved-chip.normal.chip-selected:hover,
   .saved-chip.normal.chip-selected { border-color:var(--history-col) !important; }
-  .saved-chip.normal.chip-selected:hover .chip-item-name,
   .saved-chip.normal.chip-selected .chip-item-name { color:var(--history-col) !important; }
-  .saved-chip.normal.chip-selected-over:hover,
   .saved-chip.normal.chip-selected-over { border-color:var(--edit-col) !important; }
-  .saved-chip.normal.chip-selected-over:hover .chip-item-name,
   .saved-chip.normal.chip-selected-over .chip-item-name { color:var(--edit-col) !important; }
-  .saved-chip.combo-chip.chip-selected:hover,
   .saved-chip.combo-chip.chip-selected { border-color:var(--history-col) !important; }
-  .saved-chip.combo-chip.chip-selected:hover .combo-chip-name,
   .saved-chip.combo-chip.chip-selected .combo-chip-name { color:var(--history-col) !important; }
-  .saved-chip.combo-chip.chip-selected-over:hover,
   .saved-chip.combo-chip.chip-selected-over { border-color:var(--edit-col) !important; }
-  .saved-chip.combo-chip.chip-selected-over:hover .combo-chip-name,
   .saved-chip.combo-chip.chip-selected-over .combo-chip-name { color:var(--edit-col) !important; }
-  .saved-chip.combo-chip:hover { border-color:var(--streak); }
-  .saved-chip.combo-chip:hover .combo-chip-name { color:var(--streak); }
-  .saved-chip.combo-chip.over-limit:hover { border-color:var(--danger); }
-  .saved-chip.combo-chip.over-limit:hover .combo-chip-name { color:var(--danger); }
+  @media (hover: hover) {
+    .saved-chip.normal:hover { border-color:var(--streak); }
+    .saved-chip.normal:hover .chip-item-name { color:var(--streak) !important; }
+    .saved-chip.normal.over-limit:hover { border-color:var(--danger); }
+    .saved-chip.normal.over-limit:hover .chip-item-name { color:var(--danger) !important; }
+    .saved-chip.normal.chip-selected:hover { border-color:var(--history-col) !important; }
+    .saved-chip.normal.chip-selected:hover .chip-item-name { color:var(--history-col) !important; }
+    .saved-chip.normal.chip-selected-over:hover { border-color:var(--edit-col) !important; }
+    .saved-chip.normal.chip-selected-over:hover .chip-item-name { color:var(--edit-col) !important; }
+    .saved-chip.combo-chip:hover { border-color:var(--streak); }
+    .saved-chip.combo-chip:hover .combo-chip-name { color:var(--streak); }
+    .saved-chip.combo-chip.over-limit:hover { border-color:var(--danger); }
+    .saved-chip.combo-chip.over-limit:hover .combo-chip-name { color:var(--danger); }
+    .saved-chip.combo-chip.chip-selected:hover { border-color:var(--history-col) !important; }
+    .saved-chip.combo-chip.chip-selected:hover .combo-chip-name { color:var(--history-col) !important; }
+    .saved-chip.combo-chip.chip-selected-over:hover { border-color:var(--edit-col) !important; }
+    .saved-chip.combo-chip.chip-selected-over:hover .combo-chip-name { color:var(--edit-col) !important; }
+  }
   .saved-chip.managing { background:var(--bg);border-color:var(--surface2);cursor:default; }
   .saved-chip .chip-name { flex:1; }
   .chip-edit-btn,.chip-del-btn { background:none;border:1px solid var(--border);cursor:pointer;font-size:17px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;border-radius:8px; }
@@ -640,6 +642,17 @@ function showLogDetails(){
   // clear any chip highlight
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   updateServingPreview();
+  // scroll name input back into view after details push it up
+  setTimeout(()=>{
+    const nameEl=document.getElementById('inputName');
+    const modal=document.getElementById('logModal');
+    if(nameEl&&modal){
+      // make modal temporarily scrollable to reach the input
+      modal.style.overflowY='auto';
+      nameEl.scrollIntoView({behavior:'smooth',block:'center'});
+      setTimeout(()=>modal.style.overflowY='',400);
+    }
+  },50);
 }
 function onLogNameInput(){
   document.getElementById('inputName').closest('.form-row').style.display='';
@@ -1409,8 +1422,15 @@ function openModal(id){document.getElementById(id).classList.add('open');documen
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize',()=>{
     const el=document.activeElement;
-    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA')&&el.closest('.modal')){
-      setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),50);
+    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA')){
+      const modal=el.closest('.modal');
+      if(modal){
+        modal.style.overflowY='auto';
+        setTimeout(()=>{
+          el.scrollIntoView({behavior:'smooth',block:'center'});
+          setTimeout(()=>modal.style.overflowY='',400);
+        },50);
+      }
     }
   });
 }
