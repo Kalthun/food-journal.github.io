@@ -147,6 +147,22 @@
   .saved-chip.normal.over-limit:hover { border-color:var(--danger); }
   .saved-chip.normal.over-limit:hover .chip-item-name { color:var(--danger) !important; }
   .saved-chip.over-limit { border-color:var(--danger)!important;color:var(--danger); }
+  .saved-chip.normal.chip-selected:hover,
+  .saved-chip.normal.chip-selected { border-color:var(--streak) !important; }
+  .saved-chip.normal.chip-selected:hover .chip-item-name,
+  .saved-chip.normal.chip-selected .chip-item-name { color:var(--streak) !important; }
+  .saved-chip.normal.chip-selected-over:hover,
+  .saved-chip.normal.chip-selected-over { border-color:var(--history-col) !important; }
+  .saved-chip.normal.chip-selected-over:hover .chip-item-name,
+  .saved-chip.normal.chip-selected-over .chip-item-name { color:var(--history-col) !important; }
+  .saved-chip.combo-chip.chip-selected:hover,
+  .saved-chip.combo-chip.chip-selected { border-color:var(--streak) !important; }
+  .saved-chip.combo-chip.chip-selected:hover .combo-chip-name,
+  .saved-chip.combo-chip.chip-selected .combo-chip-name { color:var(--streak) !important; }
+  .saved-chip.combo-chip.chip-selected-over:hover,
+  .saved-chip.combo-chip.chip-selected-over { border-color:var(--history-col) !important; }
+  .saved-chip.combo-chip.chip-selected-over:hover .combo-chip-name,
+  .saved-chip.combo-chip.chip-selected-over .combo-chip-name { color:var(--history-col) !important; }
   .saved-chip.combo-chip:hover { border-color:var(--streak); }
   .saved-chip.combo-chip:hover .combo-chip-name { color:var(--streak); }
   .saved-chip.combo-chip.over-limit:hover { border-color:var(--danger); }
@@ -184,7 +200,7 @@
   /* ── Combo builder ── */
   .combo-item-qty { background:#12120f;border:1px solid var(--border);border-radius:6px;padding:5px 7px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;text-align:center;width:62px;height:30px; }
   .combo-item-qty:focus { border-color:var(--combo-col); }
-  .combo-summary { background:#12120f;border:1px solid var(--tab-act);border-radius:0;padding:10px 14px;margin-top:10px;text-align:center;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;letter-spacing:.5px;flex-shrink:0; }
+  .combo-summary { background:#12120f;border:1px solid var(--text);border-radius:0;padding:10px 14px;margin-top:0;text-align:center;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;letter-spacing:.5px;flex-shrink:0; }
 
   /* ── Goals ── */
   .goals-card { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px; }
@@ -340,22 +356,52 @@
     </div>
     <div class="log-form-section">
       <div class="divider" id="logDivider" style="display:none;"></div>
-      <div class="form-row full"><div><input type="text" id="inputName" placeholder="Name"></div></div>
-      <div class="form-row" id="macroRow" style="grid-template-columns:5fr 5fr 1fr 4fr 1fr;">
-        <div><label style="color:var(--accent);">CAL (kcal)</label><input type="number" id="inputCal" placeholder="0" style="border-color:var(--accent);"></div>
+      <div class="form-row full"><div><input type="text" id="inputName" placeholder="New Entry Name" oninput="onLogNameInput()"></div></div>
+      <div id="logDetailsWrap" style="display:none;">
+      <div class="form-row" id="macroRow" style="grid-template-columns:1fr 1fr;">
+        <div><label style="color:var(--accent);">CALORIES (kcal)</label><input type="number" id="inputCal" placeholder="0" style="border-color:var(--accent);"></div>
         <div><label style="color:var(--accent2);">PROTEIN (g)</label><input type="number" id="inputPro" placeholder="0" style="border-color:var(--accent2);"></div>
-        <div style="display:flex;flex-direction:column;justify-content:flex-end;"><button type="button" onclick="stepQty(-0.25)" style="width:100%;height:46px;background:rgba(196,116,110,.15);border:1px solid var(--danger);border-radius:8px;color:var(--danger);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button></div>
-        <div><label style="color:var(--qty-col);">QTY</label><input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1" style="border-color:var(--qty-col);"></div>
-        <div style="display:flex;flex-direction:column;justify-content:flex-end;"><button type="button" onclick="stepQty(0.25)" style="width:100%;height:46px;background:rgba(135,169,135,.15);border:1px solid var(--streak);border-radius:8px;color:var(--streak);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button></div>
       </div>
-      <div id="servingPreview" style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:6px;"></div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr;align-items:end;">
+        <div><label style="color:var(--tab-act);">SIZE</label><input type="text" id="inputSize" placeholder="0" style="border-color:var(--tab-act);"></div>
+        <div><label style="color:var(--tab-act);">UNIT</label>
+          <select id="inputUnit" style="width:100%;text-align:center;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box;">
+            <option value="">—</option>
+            <option value="cup">cup</option>
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+            <option value="ml">ml</option>
+            <option value="oz">oz</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+          </select>
+        </div>
+      </div>
+      <div id="qtyRow" style="display:flex;gap:10px;margin-bottom:10px;">
+        <div style="flex:1;display:flex;flex-direction:column;">
+          <label style="visibility:hidden;display:block;font-size:10px;letter-spacing:1.5px;margin-bottom:5px;">X</label>
+          <button type="button" onclick="stepQty(-0.25)" style="flex:1;background:rgba(196,116,110,.15);border:1px solid var(--danger);border-radius:8px;color:var(--danger);font-size:14px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+        </div>
+        <div style="flex:3;display:flex;flex-direction:column;">
+          <label style="color:var(--qty-col);display:block;font-size:10px;letter-spacing:1.5px;margin-bottom:5px;text-align:center;">QUANTITY</label>
+          <input type="number" id="inputServings" placeholder="1" min="0.25" step="0.25" value="1" style="border-color:var(--qty-col);margin-bottom:0;">
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;">
+          <label style="visibility:hidden;display:block;font-size:10px;letter-spacing:1.5px;margin-bottom:5px;">X</label>
+          <button type="button" onclick="stepQty(0.25)" style="flex:1;background:rgba(135,169,135,.15);border:1px solid var(--streak);border-radius:8px;color:var(--streak);font-size:14px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+        </div>
+      </div>
+      <div style="font-size:10px;letter-spacing:1.5px;color:var(--text);text-align:center;margin-top:8px;margin-bottom:4px;">FINAL TOTALS</div>
+      <div id="servingPreview" style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;display:flex;align-items:center;gap:8px;margin-bottom:6px;"></div>
       <div class="checkbox-row" id="saveNewRow" style="margin-top:10px;">
         <input type="checkbox" id="saveItem" style="display:none;">
-        <div onclick="document.getElementById('saveItem').click();const on=document.getElementById('saveItem').checked;document.getElementById('saveItemSlider').style.transform=on?'translateX(0)':'translateX(-100%)';document.getElementById('saveItemSlider').style.opacity=on?'1':'0';document.getElementById('saveItemLabel').style.color=on?'var(--btn-fg)':'var(--text)';this.style.borderColor=on?'var(--danger)':'var(--border)';" style="position:relative;width:100%;height:38px;background:#0a0a08;border:1px solid var(--border);border-radius:0;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .3s;">
+        <div onclick="document.getElementById('saveItem').click();const on=document.getElementById('saveItem').checked;document.getElementById('saveItemSlider').style.transform=on?'translateX(0)':'translateX(-100%)';document.getElementById('saveItemSlider').style.opacity=on?'1':'0';document.getElementById('saveItemLabel').style.color=on?'var(--btn-fg)':'var(--text)';this.style.borderColor=on?'var(--danger)':'var(--danger)';" style="position:relative;width:100%;height:38px;background:#0a0a08;border:1px solid var(--danger);border-radius:0;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .3s;">
           <span id="saveItemSlider" style="position:absolute;inset:0;background:var(--danger);transform:translateX(-100%);opacity:0;transition:transform .3s ease,opacity .3s ease;"></span>
           <span id="saveItemLabel" style="position:relative;z-index:1;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);font-weight:500;transition:color .1s ease .2s;">Save as Quick item</span>
         </div>
       </div>
+      </div><!-- end logDetailsWrap -->
       <style>
         #saveItem:checked ~ * #saveItemLabel, .save-item-on #saveItemLabel { color:var(--btn-fg) !important; }
       </style>
@@ -383,10 +429,26 @@
 <div class="modal-bg" id="editSavedBg" onclick="closeModalOutside(event,'editSavedBg')">
   <div class="modal auto-height" style="padding:28px 24px 24px;border-color:var(--edit-col);">
     <h2 id="editSavedTitle" style="color:var(--edit-col)">Edit Item</h2>
-    <div class="form-row full"><div><label style="color:var(--text);">ENTRY NAME</label><input type="text" id="editSavedName" placeholder="Name"></div></div>
+    <div class="form-row full"><div><input type="text" id="editSavedName" placeholder="Name"></div></div>
     <div class="form-row">
       <div><label><span style="color:var(--text);">CALORIES (</span><span style="color:var(--accent);">kcal</span><span style="color:var(--text);">)</span></label><input type="number" id="editSavedCal" placeholder="0" style="border-color:var(--accent);"></div>
       <div><label><span style="color:var(--text);">PROTEIN (</span><span style="color:var(--accent2);">g</span><span style="color:var(--text);">)</span></label><input type="number" id="editSavedPro" placeholder="0" style="border-color:var(--accent2);"></div>
+    </div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr;">
+      <div><label style="color:var(--text);">SIZE</label><input type="text" id="editSavedSize" placeholder="0" style="border-color:var(--tab-act);"></div>
+      <div><label style="color:var(--text);">UNIT</label>
+        <select id="editSavedUnit" style="width:100%;text-align:center;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box;">
+          <option value="">—</option>
+          <option value="cup">cup</option>
+          <option value="g">g</option>
+          <option value="kg">kg</option>
+          <option value="lb">lb</option>
+          <option value="ml">ml</option>
+          <option value="oz">oz</option>
+          <option value="tbsp">tbsp</option>
+          <option value="tsp">tsp</option>
+        </select>
+      </div>
     </div>
     <div class="form-actions">
       <button class="btn btn-secondary" onclick="closeEditSavedModal()">Cancel</button>
@@ -401,10 +463,27 @@
     <h2 id="comboTitle" style="color:var(--combo-col);">New Combo</h2>
 
     <div class="form-row full" style="margin-bottom:12px;flex-shrink:0;">
-      <div><label style="color:var(--text);">COMBO NAME</label><input type="text" id="comboName" placeholder="Name"></div>
+      <div><input type="text" id="comboName" placeholder="Name"></div>
     </div>
     <div style="font-size:10px;color:var(--text);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;flex-shrink:0;text-align:center;">Select Quick Items</div>
     <div id="comboItemList" style="flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column;gap:6px;"></div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr;flex-shrink:0;margin-top:10px;">
+      <div><label style="color:var(--text);">SIZE</label><input type="text" id="comboSize" placeholder="0" style="border-color:var(--tab-act);"></div>
+      <div><label style="color:var(--text);">UNIT</label>
+        <select id="comboUnit" style="width:100%;text-align:center;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box;">
+          <option value="">—</option>
+          <option value="cup">cup</option>
+          <option value="g">g</option>
+          <option value="kg">kg</option>
+          <option value="lb">lb</option>
+          <option value="ml">ml</option>
+          <option value="oz">oz</option>
+          <option value="tbsp">tbsp</option>
+          <option value="tsp">tsp</option>
+        </select>
+      </div>
+    </div>
+    <div style="font-size:10px;letter-spacing:1.5px;color:var(--text);text-align:center;margin-top:8px;margin-bottom:4px;">FINAL TOTALS</div>
     <div class="combo-summary" id="comboSummary">
       <span style="color:var(--accent)" id="comboTotalCal">0</span>
       <span style="color:var(--accent)"> kcal</span><span style="color:var(--text)"> &nbsp;|&nbsp; </span>
@@ -413,7 +492,7 @@
     </div>
     <div class="form-actions" style="flex-shrink:0;">
       <button class="btn btn-secondary" onclick="closeComboModal()">Cancel</button>
-      <button class="btn" style="background:var(--combo-col);color:var(--btn-fg);border:1px solid var(--combo-col);" onclick="saveCombo()">Save Combo</button>
+      <button class="btn" id="saveComboBtn" style="background:var(--combo-col);color:var(--btn-fg);border:1px solid var(--combo-col);" onclick="saveCombo()">Save Combo</button>
     </div>
   </div>
 </div>
@@ -435,17 +514,22 @@ const DB = {
 let currentTab      = 'day';
 let goalMode        = 'daily';
 let editingLogTs    = null;
+let selectedQuickIdx = null;
+let selectedComboIdx = null;
 let editingSavedIdx = null;
 let editingComboIdx = null;
 let logTab          = 'quick';
 let quickTab        = 'items';
 let historyDate     = '';
 let pendingComboItems = null;
+let pendingComboSize  = '';
+let pendingComboUnit  = '';
 
 // ── Helpers ──────────────────────────────────────────
 const TZ           = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const todayStr     = () => new Date().toLocaleDateString('en-CA',{timeZone:TZ});
 const esc          = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const nameSize     = s => { const sz=(s.size&&s.unit)?s.size+s.unit:s.size||''; return esc(s.name)+(sz?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(sz)})</span>`:''); };
 const fmtTime      = ts => new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
 function localDateStr(d){
@@ -538,7 +622,7 @@ function renderEntry(e, deleteHandler, showDate=true){
 
   const mainRow=
     '<div style="flex:1;min-width:0;">'
-    +'<div class="entry-name">'+esc(e.name)+'</div>'
+    +'<div class="entry-name">'+esc(e.name)+(()=>{const sz=(e.comboSize&&e.comboUnit)?e.comboSize+e.comboUnit:e.comboSize||'';return sz?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(sz)})</span>`:''})()+'</div>'
     +'<div class="entry-time">'+timeStr+'</div>'
     +'</div>'
     +'<div class="entry-info"><div class="entry-cal">'+e.cal+' kcal</div><div class="entry-pro">'+e.pro+' g</div></div>'
@@ -553,11 +637,9 @@ function renderEntry(e, deleteHandler, showDate=true){
 
   const itemLines=[...e.comboItems].sort((a,b)=>a.name.localeCompare(b.name)).map(it=>
     '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;gap:8px;">'
-    +'<span style="font-size:12px;color:var(--text);">'+esc(it.name)+'</span>'
+    +'<span style="font-size:12px;color:var(--text);">'+nameSize(it)+'</span>'
     +'<span style="font-size:11px;white-space:nowrap;flex-shrink:0;">'
-    +(it.qty!==1
-      ?'<span style="color:var(--qty-col)">'+it.qty+'</span><span style="color:var(--text)"> x [</span><span style="color:var(--accent)">'+it.cal+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+it.pro+' g</span>':'')+'<span style="color:var(--text)">]</span>'
-      :'<span style="color:var(--accent)">'+Math.ceil(it.cal)+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+Math.floor(it.pro)+' g</span>':''))
+    +'<span style="color:var(--qty-col)">['+it.qty+']</span><span style="color:var(--text)"> x </span><span style="color:var(--accent)">'+it.cal+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+it.pro+' g</span>':'')
     +'</span></div>'
   ).join('');
 
@@ -576,6 +658,22 @@ function toggleEntryCombo(el){
 function deleteEntry(ts){
   const e=DB.entries.find(e=>e.ts===ts);
   showConfirm('Remove "'+(e?e.name:'this entry')+'"?',()=>{DB.entries=DB.entries.filter(e=>e.ts!==ts);render();});
+}
+
+function showLogDetails(){
+  document.getElementById('logDetailsWrap').style.display='';
+  document.getElementById('macroRow').style.display='';
+  document.getElementById('saveNewRow').style.display='';
+  document.getElementById('qtyRow').style.display='flex';
+  const sizeRow=document.querySelector('#logDetailsWrap .form-row:nth-child(2)');
+  if(sizeRow)sizeRow.style.display='';
+  // clear any chip highlight
+  document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
+  updateServingPreview();
+}
+function onLogNameInput(){
+  document.getElementById('inputName').closest('.form-row').style.display='';
+  if(document.getElementById('inputName').value.trim()){showLogDetails();}
 }
 
 function openAddModal(){
@@ -603,15 +701,22 @@ function openAddModal(){
   document.getElementById('inputCal').value='';
   document.getElementById('inputPro').value='';
   document.getElementById('inputServings').value='1';
+  document.getElementById('inputSize').value='';
+  document.getElementById('inputUnit').value='';
   document.getElementById('saveItem').checked=false;
   document.getElementById('saveItemSlider').style.transform='translateX(-100%)';
   document.getElementById('saveItemSlider').style.opacity='0';
   document.getElementById('saveItemLabel').style.color='var(--text)';
   const saveRow=document.querySelector('#saveNewRow div');
-  if(saveRow)saveRow.style.borderColor='var(--border)';
+  if(saveRow)saveRow.style.borderColor='var(--danger)';
   document.getElementById('savedListWrap').style.display='';
   document.getElementById('logDivider').style.display='';
   document.getElementById('saveNewRow').style.display='';
+  document.getElementById('logDetailsWrap').style.display='none';
+  document.getElementById('macroRow').style.display='';
+  document.getElementById('inputName').closest('.form-row').style.display='';
+  selectedQuickIdx=null;
+  selectedComboIdx=null;
   logTab='quick';
   setLogTab('quick');
   openModal('logModalBg');
@@ -621,6 +726,11 @@ function openAddModal(){
 function openEditLogModal(ts){
   const e=DB.entries.find(e=>e.ts===ts);if(!e)return;
   editingLogTs=ts;
+  selectedQuickIdx=null;
+  selectedComboIdx=null;
+  pendingComboItems=null;
+  pendingComboSize='';
+  pendingComboUnit='';
   const modal=document.getElementById('logModal');
   modal.classList.add('auto-height');
   document.getElementById('logModalTitle').textContent='Edit Entry';
@@ -633,9 +743,23 @@ function openEditLogModal(ts){
   document.getElementById('inputCal').value=e.baseCal!==undefined?e.baseCal:e.cal;
   document.getElementById('inputPro').value=e.basePro!==undefined?e.basePro:e.pro;
   document.getElementById('inputServings').value=e.servings!==undefined?e.servings:'1';
+  document.getElementById('inputSize').value='';
+  document.getElementById('inputUnit').value='';
+  // clear any readOnly/opacity from combo tab
+  ['inputName','inputCal','inputPro'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.readOnly=false;el.style.opacity='1';el.style.cursor='';el.style.pointerEvents='';}
+  });
+  // show all rows
   document.getElementById('savedListWrap').style.display='none';
   document.getElementById('logDivider').style.display='none';
   document.getElementById('saveNewRow').style.display='none';
+  document.getElementById('logDetailsWrap').style.display='';
+  document.getElementById('macroRow').style.display='';
+  document.getElementById('inputName').closest('.form-row').style.display='';
+  // show size/unit row and qty row
+  document.querySelectorAll('#logDetailsWrap .form-row').forEach(el=>el.style.display='');
+  document.getElementById('qtyRow').style.display='flex';
   updateServingPreview();
   openModal('logModalBg');
   setTimeout(()=>document.getElementById('inputName').focus(),120);
@@ -657,8 +781,12 @@ function submitLogForm(){
     let entryTs=Date.now();
     if(historyOpen&&entryDate!==todayStr()){const d=new Date(entryDate+'T23:59:00');entryTs=d.getTime();}
     const comboItems=pendingComboItems||null;
+    const comboSize=pendingComboSize||'';
+    const comboUnit=pendingComboUnit||'';
     pendingComboItems=null;
-    DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,date:entryDate,ts:entryTs,...(comboItems?{comboItems}:{})},...DB.entries];
+    pendingComboSize='';
+    pendingComboUnit='';
+    DB.entries=[{name,cal,pro,baseCal:parseInt(document.getElementById('inputCal').value)||0,basePro:parseInt(document.getElementById('inputPro').value)||0,servings,date:entryDate,ts:entryTs,...(comboItems?{comboItems,comboSize,comboUnit}:{})},...DB.entries];
     if(document.getElementById('saveItem').checked){
       const saved=DB.saved;
       if(!saved.find(s=>s.name.toLowerCase()===name.toLowerCase())){
@@ -707,7 +835,7 @@ function updateServingPreview(){
   const hasInput=nameEl.value.trim()||cal||pro;
   if(divider&&editingLogTs===null)divider.style.display=(hasInput||logTab==='combo')?'none':'';
   const tCal=Math.ceil(cal*servings),tPro=Math.floor(pro*servings);
-  const boxStyle='background:#0a0a08;border:1px solid var(--tab-act);padding:8px 14px;text-align:center;border-radius:0;flex:1;';
+  const boxStyle='background:#0a0a08;border:1px solid var(--text);padding:8px 14px;text-align:center;border-radius:0;flex:1;';
   preview.innerHTML=
     '<div style="'+boxStyle+'">'
     +'<span style="color:var(--accent)">'+tCal+' kcal</span>'
@@ -726,7 +854,22 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ── Log Tab ───────────────────────────────────────────
 function setLogTab(tab){
   logTab=tab;
+  // clear selections when switching tabs
+  selectedQuickIdx=null;
+  selectedComboIdx=null;
+  pendingComboItems=null;
+  pendingComboSize='';
+  pendingComboUnit='';
+  document.getElementById('inputName').value='';
+  document.getElementById('inputCal').value='';
+  document.getElementById('inputPro').value='';
+  document.getElementById('inputServings').value='1';
+  document.getElementById('logDetailsWrap').style.display='none';
+  document.getElementById('macroRow').style.display='';
+  const sizeRow=document.querySelector('#logDetailsWrap .form-row:nth-child(2)');
+  if(sizeRow)sizeRow.style.display='';
   const isCombo=tab==='combo';
+  document.getElementById('inputName').closest('.form-row').style.display=isCombo?'none':'';
   document.getElementById('logTabQuick').style.background=isCombo?'var(--surface2)':'var(--danger)';
   document.getElementById('logTabQuick').style.color=isCombo?'var(--text)':'var(--btn-fg)';
   document.getElementById('logTabCombo').style.background=isCombo?'var(--combo-col)':'var(--surface2)';
@@ -766,9 +909,9 @@ function renderSavedChips(){
       const overLimit=cal>calLeft;
       const cls='saved-chip normal'+(overLimit?' over-limit':'');
       const proStr=pro>0?' <span class="chip-sep" style="color:var(--text)">|</span> <span class="chip-pro" style="color:var(--accent2)">'+pro+' g</span>':'';
-      html+='<span class="'+cls+'" style="flex-direction:row;align-items:center;gap:10px;cursor:pointer;" onclick="quickAdd('+origIdx+')">'
+      html+='<span class="'+cls+'" id="qchip'+origIdx+'" style="flex-direction:row;align-items:center;gap:10px;cursor:pointer;" onclick="quickAdd('+origIdx+')">'
         +'<span style="flex:1;display:flex;flex-direction:column;gap:3px;">'
-        +'<span class="chip-item-name" style="font-size:13px;font-weight:500;color:var(--text);">'+esc(name)+'</span>'
+        +'<span class="chip-item-name" style="font-size:13px;font-weight:500;color:var(--text);">'+nameSize(item)+'</span>'
         +'<span style="font-size:11px;"><span class="chip-cal" style="color:var(--accent)">'+cal+' kcal</span>'+proStr+'</span>'
         +'</span>'
         +'</span>';
@@ -782,9 +925,9 @@ function renderSavedChips(){
       const totalPro=Math.floor(combo.items.reduce((s,it)=>s+it.pro*it.qty,0));
       const overLimit=totalCal>calLeft;
       const cls='saved-chip combo-chip'+(overLimit?' over-limit':'');
-      html+='<span class="'+cls+'" style="flex-direction:row;align-items:center;gap:10px;cursor:pointer;" onclick="quickAddCombo('+origIdx+')">'
+      html+='<span class="'+cls+'" id="cchip'+origIdx+'" style="flex-direction:row;align-items:center;gap:10px;cursor:pointer;" onclick="quickAddCombo('+origIdx+')">'
         +'<span style="flex:1;display:flex;flex-direction:column;gap:3px;">'
-        +'<span class="combo-chip-name" style="font-size:13px;font-weight:500;">'+esc(name)+'</span>'
+        +'<span class="combo-chip-name" style="font-size:13px;font-weight:500;">'+nameSize(combo)+'</span>'
         +'<span style="font-size:11px;"><span style="color:var(--accent)">'+totalCal+' kcal</span>'+(totalPro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+totalPro+' g</span>':'')+'</span>'
         +'</span>'
         +'</span>';
@@ -794,11 +937,38 @@ function renderSavedChips(){
 }
 
 function quickAdd(i){
+  // deselect if tapping same item
+  if(selectedQuickIdx===i){
+    selectedQuickIdx=null;
+    document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
+    document.getElementById('inputName').value='';
+    document.getElementById('inputCal').value='';
+    document.getElementById('inputPro').value='';
+    document.getElementById('inputServings').value='1';
+    document.getElementById('inputName').closest('.form-row').style.display='';
+    document.getElementById('logDetailsWrap').style.display='none';
+    document.getElementById('saveNewRow').style.display='';
+    return;
+  }
+  selectedQuickIdx=i;
   const s=DB.saved[i];
   document.getElementById('inputName').value=s.name;
   document.getElementById('inputCal').value=s.cal;
   document.getElementById('inputPro').value=s.pro;
   document.getElementById('inputServings').value='1';
+  // highlight selected chip, clear others
+  document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
+  const chip=document.getElementById('qchip'+i);
+  if(chip){
+    chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
+  }
+  // hide name, cal/pro, size/unit, save toggle — keep qty and preview
+  document.getElementById('inputName').closest('.form-row').style.display='none';
+  document.getElementById('logDivider').style.display='none';
+  document.getElementById('macroRow').style.display='none';
+  document.querySelector('#logDetailsWrap .form-row:nth-child(2)').style.display='none';
+  document.getElementById('saveNewRow').style.display='none';
+  document.getElementById('logDetailsWrap').style.display='';
   updateServingPreview();
 }
 
@@ -821,6 +991,21 @@ function toggleLogCombo(uid){
 }
 
 function quickAddCombo(i){
+  // deselect if tapping same item
+  if(selectedComboIdx===i){
+    selectedComboIdx=null;
+    document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
+    document.getElementById('inputName').value='';
+    document.getElementById('inputCal').value='';
+    document.getElementById('inputPro').value='';
+    document.getElementById('inputServings').value='1';
+    pendingComboItems=null;
+    pendingComboSize='';
+    pendingComboUnit='';
+    document.getElementById('logDetailsWrap').style.display='none';
+    return;
+  }
+  selectedComboIdx=i;
   const combo=DB.combos[i];
   const totalCal=Math.ceil(combo.items.reduce((s,it)=>s+it.cal*it.qty,0));
   const totalPro=Math.floor(combo.items.reduce((s,it)=>s+it.pro*it.qty,0));
@@ -829,6 +1014,21 @@ function quickAddCombo(i){
   document.getElementById('inputPro').value=totalPro;
   document.getElementById('inputServings').value='1';
   pendingComboItems=combo.items;
+  pendingComboSize=combo.size||'';
+  pendingComboUnit=combo.unit||'';
+  // highlight selected chip, clear others
+  document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
+  const chip=document.getElementById('cchip'+i);
+  if(chip){
+    chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
+  }
+  // show only qty + preview, hide everything else
+  document.getElementById('inputName').closest('.form-row').style.display='none';
+  document.getElementById('logDivider').style.display='none';
+  document.getElementById('macroRow').style.display='none';
+  document.querySelector('#logDetailsWrap .form-row:nth-child(2)').style.display='none';
+  document.getElementById('saveNewRow').style.display='none';
+  document.getElementById('logDetailsWrap').style.display='';
   updateServingPreview();
 }
 
@@ -843,6 +1043,8 @@ function openNewSavedModal(){
   document.getElementById('editSavedName').value='';
   document.getElementById('editSavedCal').value='';
   document.getElementById('editSavedPro').value='';
+  document.getElementById('editSavedSize').value='';
+  document.getElementById('editSavedUnit').value='';
   openModal('editSavedBg');
   setTimeout(()=>document.getElementById('editSavedName').focus(),120);
 }
@@ -858,6 +1060,8 @@ function openEditSavedModal(i){
   document.getElementById('editSavedName').value=s.name;
   document.getElementById('editSavedCal').value=s.cal;
   document.getElementById('editSavedPro').value=s.pro;
+  document.getElementById('editSavedSize').value=s.size||'';
+  document.getElementById('editSavedUnit').value=s.unit||'';
   openModal('editSavedBg');
   setTimeout(()=>document.getElementById('editSavedName').focus(),120);
 }
@@ -866,15 +1070,18 @@ function saveEditedSaved(){
   const name=document.getElementById('editSavedName').value.trim();
   const cal=parseInt(document.getElementById('editSavedCal').value)||0;
   const pro=parseInt(document.getElementById('editSavedPro').value)||0;
+  const size=document.getElementById('editSavedSize').value.trim();
+  const unit=document.getElementById('editSavedUnit').value;
   if(!name){document.getElementById('editSavedName').focus();return;}
   const saved=DB.saved;
+  const sizeStr=size&&unit?size+' '+unit:size||'';
   if(editingSavedIdx===null){
     if(saved.find(s=>s.name.toLowerCase()===name.toLowerCase())){showToast('"'+name+'" already exists');return;}
-    saved.push({name,cal,pro});
+    saved.push({name,cal,pro,size,unit});
     showToast('"'+name+'" Quick item saved');
   } else {
     if(saved.find((s,i)=>i!==editingSavedIdx&&s.name.toLowerCase()===name.toLowerCase())){showToast('"'+name+'" already exists');return;}
-    saved[editingSavedIdx]={name,cal,pro};
+    saved[editingSavedIdx]={name,cal,pro,size,unit};
     showToast('"'+name+'" updated');
   }
   DB.saved=saved;
@@ -914,7 +1121,7 @@ function renderManagePanel(){
   el.innerHTML=sorted.map(item=>
     '<div class="saved-chip managing" style="flex-direction:row;align-items:center;gap:10px;">'
     +'<div style="flex:1;display:flex;flex-direction:column;gap:3px;">'
-    +'<span style="font-size:13px;font-weight:500;color:var(--text);">'+esc(item.name)+'</span>'
+    +'<span style="font-size:13px;font-weight:500;color:var(--text);">'+nameSize(item)+'</span>'
     +'<span style="font-size:11px;"><span style="color:var(--accent)">'+item.cal+' kcal</span>'+(item.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+item.pro+' g</span>':'')+'</span>'
     +'</div>'
     +'<div style="display:flex;gap:6px;flex-shrink:0;">'
@@ -935,11 +1142,9 @@ function renderManageCombos(){
     const totalPro=Math.floor(combo.items.reduce((s,it)=>s+it.pro*it.qty,0));
     const itemLines=[...combo.items].sort((a,b)=>a.name.localeCompare(b.name)).map(it=>
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;gap:8px;">'
-      +'<span style="font-size:12px;color:var(--text);">'+esc(it.name)+'</span>'
+      +'<span style="font-size:12px;color:var(--text);">'+nameSize(it)+'</span>'
       +'<span style="font-size:11px;white-space:nowrap;flex-shrink:0;">'
-      +(it.qty!==1
-        ?'<span style="color:var(--qty-col)">'+it.qty+'</span><span style="color:var(--text)"> x [</span><span style="color:var(--accent)">'+it.cal+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+it.pro+' g</span>':'')+'<span style="color:var(--text)">]</span>'
-        :'<span style="color:var(--accent)">'+Math.ceil(it.cal)+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+Math.floor(it.pro)+' g</span>':''))
+      +'<span style="color:var(--qty-col)">['+it.qty+']</span><span style="color:var(--text)"> x </span><span style="color:var(--accent)">'+(it.qty!==1?it.cal:Math.ceil(it.cal))+' kcal</span>'+(it.pro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+(it.qty!==1?it.pro:Math.floor(it.pro))+' g</span>':'')
       +'</span>'
       +'</div>'
     ).join('');
@@ -947,7 +1152,7 @@ function renderManageCombos(){
       // main row: stacked name+macros on left, buttons on right
       +'<div style="display:flex;align-items:center;gap:10px;">'
       +'<div style="flex:1;display:flex;flex-direction:column;gap:3px;">'
-      +'<span style="font-size:13px;font-weight:500;color:var(--text);">'+esc(combo.name)+'</span>'
+      +'<span style="font-size:13px;font-weight:500;color:var(--text);">'+nameSize(combo)+'</span>'
       +'<span style="font-size:11px;"><span style="color:var(--accent)">'+totalCal+' kcal</span>'+(totalPro?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+totalPro+' g</span>':'')+'</span>'
       +'</div>'
       +'<div style="display:flex;gap:6px;flex-shrink:0;" onclick="event.stopPropagation()">'
@@ -988,9 +1193,14 @@ function openComboModal(idx){
   const combo=idx!==null?DB.combos[idx]:null;
   document.getElementById('comboTitle').textContent=combo?'Edit Combo':'New Combo';
   const comboModalEl=document.querySelector('#comboBg .modal');
-  document.getElementById('comboTitle').style.color='var(--combo-col)';
-  if(comboModalEl)comboModalEl.style.borderColor='var(--combo-col)';
+  const comboColor=combo?'var(--edit-col)':'var(--combo-col)';
+  document.getElementById('comboTitle').style.color=comboColor;
+  if(comboModalEl)comboModalEl.style.borderColor=comboColor;
+  document.getElementById('saveComboBtn').style.background=comboColor;
+  document.getElementById('saveComboBtn').style.borderColor=comboColor;
   document.getElementById('comboName').value=combo?combo.name:'';
+  document.getElementById('comboSize').value=combo&&combo.size?combo.size:'';
+  document.getElementById('comboUnit').value=combo&&combo.unit?combo.unit:'';
   const saved=DB.saved;
   if(!saved.length){showToast('Add some Quick items first!');return;}
   const list=document.getElementById('comboItemList');
@@ -1001,12 +1211,15 @@ function openComboModal(idx){
     const checked=!!existing,qty=existing?existing.qty:1;
     const proStr=s.pro>0?' <span style="color:var(--text)">|</span> <span style="color:var(--accent2)">'+s.pro+' g</span>':'';
     return '<span class="saved-chip normal'+(checked?' combo-selected':'')+'" id="crow'+i+'" onclick="onComboChipClick('+i+')" style="'+(checked?'border-color:var(--combo-col);':'')+'">'
-      +'<span class="chip-name">'+esc(s.name)+' <span style="color:var(--accent)">'+s.cal+' kcal</span>'+proStr+'</span>'
+      +'<span style="flex:1;display:flex;flex-direction:column;gap:3px;">'
+      +'<span style="font-size:13px;font-weight:500;color:var(--text);">'+nameSize(s)+'</span>'
+      +'<span style="font-size:11px;"><span style="color:var(--accent)">'+s.cal+' kcal</span>'+proStr+'</span>'
+      +'</span>'
       +'<span id="cqty-wrap'+i+'" style="display:'+(checked?'flex':'none')+';align-items:center;gap:4px;flex-shrink:0;" onclick="event.stopPropagation()">'
-      +'<span style="font-size:10px;color:var(--qty-col);letter-spacing:1px;text-transform:uppercase;margin-right:2px;">QTY</span>'
       +'<button type="button" onclick="stepComboQty('+i+',-0.25)" style="width:30px;height:30px;flex-shrink:0;background:rgba(196,116,110,.15);border:1px solid var(--danger);border-radius:6px;color:var(--danger);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>'
       +'<input class="combo-item-qty" type="number" id="cqty'+i+'" value="'+qty+'" min="0.25" step="0.25" oninput="updateComboSummary()" style="width:62px;height:30px;border-color:var(--qty-col);" />'
       +'<button type="button" onclick="stepComboQty('+i+',0.25)" style="width:30px;height:30px;flex-shrink:0;background:rgba(135,169,135,.15);border:1px solid var(--streak);border-radius:6px;color:var(--streak);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>'
+      
       +'</span>'
       +'</span>';
   }).join('');
@@ -1052,20 +1265,23 @@ function updateComboSummary(){
 function saveCombo(){
   const name=document.getElementById('comboName').value.trim();
   if(!name){document.getElementById('comboName').focus();return;}
+  const size=document.getElementById('comboSize').value.trim();
+  const unit=document.getElementById('comboUnit').value;
+  const sizeStr=size&&unit?size+' '+unit:size||'';
   const saved=DB.saved;
   const items=[];
   saved.forEach((s,i)=>{
     const row=document.getElementById('crow'+i);
     if(row&&row.classList.contains('combo-selected')){
       const qty=parseFloat(document.getElementById('cqty'+i).value)||1;
-      items.push({savedIdx:i,name:s.name,cal:s.cal,pro:s.pro,qty});
+      items.push({savedIdx:i,name:s.name,cal:s.cal,pro:s.pro,qty,size:s.size||'',unit:s.unit||''});
     }
   });
   if(!items.length){showToast('Select at least one item');return;}
   const combos=DB.combos;
   if(combos.find((c,i)=>c.name.toLowerCase()===name.toLowerCase()&&i!==editingComboIdx)){showToast('"'+name+'" already exists');return;}
-  if(editingComboIdx!==null){combos[editingComboIdx]={name,items};}
-  else{combos.push({name,items});}
+  if(editingComboIdx!==null){combos[editingComboIdx]={name,size,unit,items};}
+  else{combos.push({name,size,unit,items});}
   DB.combos=combos;
   closeComboModal();
   renderManageCombos();
@@ -1279,6 +1495,7 @@ function toggleGoals(){
     panel.style.display='none';document.getElementById('app').style.display='';
     fab.classList.remove('active');
     fab.style.background='';fab.style.borderColor='';fab.style.color='';
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
   } else {
     closeHistory();
     document.getElementById('managePanel').style.display='none';document.getElementById('manageFab').classList.remove('active');;document.getElementById('manageFab').style.background='';document.getElementById('manageFab').style.borderColor='';document.getElementById('manageFab').style.color='';
