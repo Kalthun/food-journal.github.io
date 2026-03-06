@@ -358,7 +358,6 @@
       <div class="saved-list" id="savedList"></div>
     </div>
     <div class="log-form-section">
-      <div class="divider" id="logDivider" style="display:none;"></div>
       <div class="form-row full"><div><input type="text" id="inputName" placeholder="New Entry Name" oninput="onLogNameInput()"></div></div>
       <div id="logDetailsWrap" style="display:none;">
       <div class="form-row" id="macroRow" style="grid-template-columns:1fr 1fr;">
@@ -634,7 +633,9 @@ function deleteEntry(ts){
 }
 
 function showLogDetails(){
-  document.getElementById('logDetailsWrap').style.display='';
+  const wrap=document.getElementById('logDetailsWrap');
+  const wasHidden=wrap.style.display==='none';
+  wrap.style.display='';
   document.getElementById('macroRow').style.display='';
   document.getElementById('saveNewRow').style.display='';
   document.getElementById('qtyRow').style.display='flex';
@@ -643,16 +644,28 @@ function showLogDetails(){
   // clear any chip highlight
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   updateServingPreview();
-  // scroll modal so name input stays visible
-  setTimeout(()=>{
-    const modal=document.getElementById('logModal');
-    const nameEl=document.getElementById('inputName');
-    if(modal&&nameEl) modal.scrollTop=nameEl.offsetTop-modal.offsetTop-8;
-  },50);
+  // only scroll modal to name input when details are first revealed, not on every keystroke
+  if(wasHidden){
+    setTimeout(()=>{
+      const modal=document.getElementById('logModal');
+      const nameEl=document.getElementById('inputName');
+      if(modal&&nameEl) modal.scrollTop=nameEl.offsetTop-modal.offsetTop-8;
+    },50);
+  }
 }
 function onLogNameInput(){
+  if(selectedQuickIdx!==null||selectedComboIdx!==null)return;
   document.getElementById('inputName').closest('.form-row').style.display='';
-  if(document.getElementById('inputName').value.trim()){showLogDetails();}
+  const val=document.getElementById('inputName').value.trim();
+  if(val){
+    showLogDetails();
+  } else {
+    // field cleared — just reset scroll so the chip list isn't cut off
+    document.getElementById('logModal').scrollTop=0;
+  }
+  // reset list scroll/padding so no chips are clipped
+  const list=document.getElementById('savedList');
+  if(list){list.style.paddingTop='';list.style.paddingBottom='';list.scrollTop=0;}
 }
 
 function openAddModal(){
@@ -689,7 +702,6 @@ function openAddModal(){
   const saveRow=document.querySelector('#saveNewRow div');
   if(saveRow)saveRow.style.borderColor='var(--danger)';
   document.getElementById('savedListWrap').style.display='';
-  document.getElementById('logDivider').style.display='';
   document.getElementById('saveNewRow').style.display='';
   document.getElementById('logDetailsWrap').style.display='none';
   document.getElementById('macroRow').style.display='';
@@ -731,7 +743,6 @@ function openEditLogModal(ts){
   });
   // show all rows
   document.getElementById('savedListWrap').style.display='none';
-  document.getElementById('logDivider').style.display='none';
   document.getElementById('saveNewRow').style.display='none';
   document.getElementById('logDetailsWrap').style.display='';
   document.getElementById('macroRow').style.display='';
@@ -793,7 +804,6 @@ function closeLogModal(){
   document.getElementById('logModal').style.height='';
   document.getElementById('logModal').scrollTop=0;
   document.getElementById('inputServings').value='1';
-  document.getElementById('logDivider').style.display='';
 }
 
 function stepQty(delta){
@@ -808,14 +818,12 @@ function updateServingPreview(){
   const calEl=document.getElementById('inputCal');
   const proEl=document.getElementById('inputPro');
   const srvEl=document.getElementById('inputServings');
-  const divider=document.getElementById('logDivider');
   const preview=document.getElementById('servingPreview');
   if(!nameEl||!calEl||!proEl||!srvEl||!preview)return;
   const servings=parseFloat(srvEl.value)||1;
   const cal=parseInt(calEl.value)||0;
   const pro=parseInt(proEl.value)||0;
   const hasInput=nameEl.value.trim()||cal||pro;
-  if(divider&&editingLogTs===null)divider.style.display=(hasInput||logTab==='combo')?'none':'';
   const tCal=Math.ceil(cal*servings),tPro=Math.floor(pro*servings);
   const boxStyle='background:#0a0a08;border:1px solid var(--text);padding:8px 14px;text-align:center;border-radius:0;flex:1;';
   preview.innerHTML=
@@ -974,7 +982,6 @@ function quickAdd(i){
   const chip=document.getElementById('qchip'+i);
   if(chip) chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
   document.getElementById('inputName').closest('.form-row').style.display='none';
-  document.getElementById('logDivider').style.display='none';
   document.getElementById('macroRow').style.display='none';
   document.querySelector('#logDetailsWrap .form-row:nth-child(2)').style.display='none';
   document.getElementById('saveNewRow').style.display='none';
@@ -1034,7 +1041,6 @@ function quickAddCombo(i){
   const chip=document.getElementById('cchip'+i);
   if(chip) chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
   document.getElementById('inputName').closest('.form-row').style.display='none';
-  document.getElementById('logDivider').style.display='none';
   document.getElementById('macroRow').style.display='none';
   document.querySelector('#logDetailsWrap .form-row:nth-child(2)').style.display='none';
   document.getElementById('saveNewRow').style.display='none';
