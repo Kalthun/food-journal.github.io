@@ -368,7 +368,7 @@
       <div class="form-row" id="sizeUnitRow" style="grid-template-columns:1fr 1fr;align-items:end;">
         <div><label style="color:var(--tab-act);">SIZE</label><input type="text" id="inputSize" placeholder="0" style="border-color:var(--tab-act);"></div>
         <div><label style="color:var(--tab-act);">UNIT</label>
-          <select id="inputUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
+          <select id="inputUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;text-align-last:center;-webkit-text-align-last:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
             <option value="">—</option>
             <option value="cup">cup</option>
             <option value="g">g</option>
@@ -441,7 +441,7 @@
     <div class="form-row" style="grid-template-columns:1fr 1fr;">
       <div><label style="color:var(--text);">SIZE</label><input type="text" id="editSavedSize" placeholder="0" style="border-color:var(--tab-act);"></div>
       <div><label style="color:var(--text);">UNIT</label>
-        <select id="editSavedUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
+        <select id="editSavedUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;text-align-last:center;-webkit-text-align-last:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
             <option value="">—</option>
             <option value="cup">cup</option>
             <option value="g">g</option>
@@ -475,7 +475,7 @@
     <div class="form-row" style="grid-template-columns:1fr 1fr;flex-shrink:0;margin-top:10px;">
       <div><label style="color:var(--text);">SIZE</label><input type="text" id="comboSize" placeholder="0" style="border-color:var(--tab-act);"></div>
       <div><label style="color:var(--text);">UNIT</label>
-        <select id="comboUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
+        <select id="comboUnit" onchange="onUnitChange(this)" style="width:100%;text-align:center;text-align-last:center;-webkit-text-align-last:center;background:#12120f;border:1px solid var(--tab-act);border-radius:8px;padding:11px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;box-sizing:border-box;appearance:none;cursor:pointer;">
             <option value="">—</option>
             <option value="cup">cup</option>
             <option value="g">g</option>
@@ -538,6 +538,7 @@ function resetUnitSelect(id){
   sel.id=id;sel.onchange=function(){onUnitChange(this);};
   sel.style.cssText=el.style.cssText;
   sel.style.flex='';sel.style.minWidth='';
+  sel.style.textAlignLast='center';
   sel.innerHTML='<option value="">—</option><option value="cup">cup</option><option value="g">g</option><option value="kg">kg</option><option value="lb">lb</option><option value="ml">ml</option><option value="oz">oz</option><option value="tbsp">tbsp</option><option value="tsp">tsp</option><option value="__custom__">custom</option>';
   sel.selectedIndex=0;
   const wrap=document.getElementById('_unitWrap');
