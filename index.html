@@ -400,7 +400,7 @@
       <div id="servingPreview" style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;display:flex;align-items:center;gap:8px;margin-bottom:6px;"></div>
       <div class="checkbox-row" id="saveNewRow" style="margin-top:10px;">
         <input type="checkbox" id="saveItem" style="display:none;">
-        <div onclick="document.getElementById('saveItem').click();const on=document.getElementById('saveItem').checked;document.getElementById('saveItemSlider').style.transform=on?'translateX(0)':'translateX(-100%)';document.getElementById('saveItemSlider').style.opacity=on?'1':'0';document.getElementById('saveItemLabel').style.color=on?'var(--btn-fg)':'var(--text)';this.style.borderColor=on?'var(--danger)':'var(--danger)';" style="position:relative;width:100%;height:38px;background:#0a0a08;border:1px solid var(--danger);border-radius:0;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .3s;">
+        <div onclick="document.getElementById('saveItem').click();const on=document.getElementById('saveItem').checked;document.getElementById('saveItemSlider').style.transform=on?'translateX(0)':'translateX(-100%)';document.getElementById('saveItemSlider').style.opacity=on?'1':'0';document.getElementById('saveItemLabel').style.color=on?'var(--btn-fg)':'var(--text)';document.getElementById('saveItemLabel').textContent=on?'✓ READY TO SAVE':'Save as Quick item';this.style.borderColor=on?'var(--danger)':'var(--danger)';" style="position:relative;width:100%;height:38px;background:#0a0a08;border:1px solid var(--danger);border-radius:0;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .3s;">
           <span id="saveItemSlider" style="position:absolute;inset:0;background:var(--danger);transform:translateX(-100%);opacity:0;transition:transform .3s ease,opacity .3s ease;"></span>
           <span id="saveItemLabel" style="position:relative;z-index:1;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);font-weight:500;transition:color .1s ease .2s;">Save as Quick item</span>
         </div>
@@ -552,19 +552,18 @@ function getUnitValue(id){
   return el.value.trim();
 }
 function setUnitValue(id,val){
+  // always start from a clean select
+  resetUnitSelect(id);
   const el=document.getElementById(id);
   if(!el)return;
-  if(el.tagName==='SELECT'){
-    const presets=['','cup','g','kg','lb','ml','oz','tbsp','tsp'];
-    if(presets.includes(val)){el.value=val;el.selectedIndex=val===''?0:el.selectedIndex;return;}
-    const inp=document.createElement('input');
-    inp.type='text';inp.id=id;inp.placeholder='unit';inp.autocomplete='off';
-    inp.style.cssText=el.style.cssText;
-    inp.value=val;
-    el.parentNode.replaceChild(inp,el);
-  } else {
-    el.value=val;
-  }
+  const presets=['','cup','g','kg','lb','ml','oz','tbsp','tsp'];
+  if(presets.includes(val)){el.value=val;el.selectedIndex=val===''?0:el.selectedIndex;return;}
+  // non-preset — trigger custom mode via onUnitChange flow
+  el.value='__custom__';
+  onUnitChange(el);
+  // now set the value on the newly created input
+  const inp=document.getElementById(id);
+  if(inp)inp.value=val;
 }
 const DB = {
   get entries(){ try{return JSON.parse(localStorage.getItem('fl_entries')||'[]')}catch{return[]} },
@@ -596,7 +595,7 @@ let pendingComboUnit  = '';
 const TZ           = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const todayStr     = () => new Date().toLocaleDateString('en-CA',{timeZone:TZ});
 const esc          = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const nameSize     = s => { const sz=(s.size&&s.unit)?s.size+' '+s.unit:s.size||''; return esc(s.name)+(sz?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(sz)})</span>`:''); };
+const nameSize     = s => { const sz=(s.size||s.unit)?[s.size,s.unit].filter(Boolean).join(' '):''; return esc(s.name)+(sz?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(sz)})</span>`:''); };
 const fmtTime      = ts => new Date(ts).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
 
 function localDateStr(d){
@@ -689,7 +688,7 @@ function renderEntry(e, deleteHandler, showDate=true){
 
   const mainRow=
     '<div style="flex:1;min-width:0;">'
-    +'<div class="entry-name">'+esc(e.name)+(()=>{const sz=(e.comboSize&&e.comboUnit)?e.comboSize+' '+e.comboUnit:(e.comboSize||'');const rsz=(e.size&&e.unit)?e.size+' '+e.unit:(e.size||'');const display=sz||rsz;const qty=(e.servings&&e.servings!==1)?` <span style="color:var(--qty-col);font-size:0.9em;">x${e.servings}</span>`:'';return display?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(display)})</span>${qty}`:qty;})()+'</div>'
+    +'<div class="entry-name">'+esc(e.name)+(()=>{const sz=(e.comboSize||e.comboUnit)?[e.comboSize,e.comboUnit].filter(Boolean).join(' '):'';const rsz=(e.size||e.unit)?[e.size,e.unit].filter(Boolean).join(' '):'';const display=sz||rsz;const qty=(e.servings&&e.servings!==1)?` <span style="color:var(--qty-col);font-size:0.9em;">x${e.servings}</span>`:'';return display?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(display)})</span>${qty}`:qty;})()+'</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">'
     +'<div class="entry-time">'+timeStr+'</div>'
     +'<div style="text-align:right;"><span class="entry-cal">'+e.cal+' kcal</span> <span style="color:var(--muted)">|</span> <span class="entry-pro">'+e.pro+' g</span></div>'
@@ -796,6 +795,7 @@ function openAddModal(){
   document.getElementById('saveItemSlider').style.transform='translateX(-100%)';
   document.getElementById('saveItemSlider').style.opacity='0';
   document.getElementById('saveItemLabel').style.color='var(--text)';
+  document.getElementById('saveItemLabel').textContent='Save as Quick item';
   const saveRow=document.querySelector('#saveNewRow div');
   if(saveRow)saveRow.style.borderColor='var(--danger)';
   document.getElementById('savedListWrap').style.display='';
@@ -832,6 +832,7 @@ function openEditLogModal(ts){
   document.getElementById('inputPro').value=e.basePro!==undefined?e.basePro:e.pro;
   document.getElementById('inputServings').value=e.servings!==undefined?e.servings:'1';
   document.getElementById('inputSize').value=e.size||'';
+  resetUnitSelect('inputUnit');
   setUnitValue('inputUnit',e.unit||'');
   // clear any readOnly/opacity from combo tab
   ['inputName','inputCal','inputPro'].forEach(id=>{
@@ -1064,6 +1065,8 @@ function quickAdd(i){
     document.getElementById('inputCal').value='';
     document.getElementById('inputPro').value='';
     document.getElementById('inputServings').value='1';
+    document.getElementById('inputSize').value='';
+    resetUnitSelect('inputUnit');
     document.getElementById('inputName').closest('.form-row').style.display='';
     document.getElementById('logDetailsWrap').style.display='none';
     document.getElementById('saveNewRow').style.display='';
@@ -1082,6 +1085,9 @@ function quickAdd(i){
   document.getElementById('inputCal').value=s.cal;
   document.getElementById('inputPro').value=s.pro;
   document.getElementById('inputServings').value='1';
+  document.getElementById('inputSize').value=s.size||'';
+  resetUnitSelect('inputUnit');
+  setUnitValue('inputUnit',s.unit||'');
   document.querySelectorAll('#savedList .saved-chip').forEach(c=>{c.classList.remove('chip-selected','chip-selected-over');});
   const chip=document.getElementById('qchip'+i);
   if(chip) chip.classList.add(chip.classList.contains('over-limit')?'chip-selected-over':'chip-selected');
