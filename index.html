@@ -128,9 +128,9 @@
   @keyframes popIn { from{transform:scale(.95);opacity:0} to{transform:scale(1);opacity:1} }
   .modal h2 { font-family:'DM Mono',monospace;font-size:18px;font-weight:500;margin-bottom:14px;flex-shrink:0;text-align:center;letter-spacing:1px; }
 
-  /* Log modal — fixed size, never shrinks when keyboard appears */
+  /* Log modal — uses visualViewport JS to stay locked, keyboard slides under */
   #logModalBg { align-items:flex-start; padding-top:24px; }
-  #logModalBg .modal { overflow-y: auto; flex-shrink:0; }
+  #logModalBg .modal { overflow-y:auto; }
   #logModalBg .modal #savedListWrap { flex:1 1 0;min-height:0;display:flex;flex-direction:column;overflow:hidden; }
   #logModalBg .modal #savedListWrap .saved-list { flex:1 1 0;overflow-y:auto;min-height:0;margin-bottom:8px; }
   #logModalBg .modal .log-form-section { flex:0 0 auto;display:flex;flex-direction:column; }
@@ -712,15 +712,6 @@ function openAddModal(){
   logTab='quick';
   setLogTab('quick');
   openModal('logModalBg');
-  // Lock modal height before keyboard can shrink it on iOS
-  const _logModal=document.getElementById('logModal');
-  _logModal.style.height='';
-  _logModal.style.maxHeight='';
-  requestAnimationFrame(()=>{
-    const h=_logModal.offsetHeight;
-    _logModal.style.height=h+'px';
-    _logModal.style.maxHeight=h+'px';
-  });
   setTimeout(()=>document.getElementById('inputName').focus(),120);
 }
 
@@ -813,6 +804,9 @@ function closeLogModal(){
   document.getElementById('logModal').style.maxHeight='';
   document.getElementById('logModal').style.height='';
   document.getElementById('logModal').scrollTop=0;
+  // clear any visualViewport pinning
+  const bg=document.getElementById('logModalBg');
+  bg.style.top='';bg.style.height='';bg.style.position='';
   document.getElementById('inputServings').value='1';
 }
 
@@ -1596,6 +1590,36 @@ document.addEventListener('keydown',e=>{
   }
   if(e.key==='Escape'){closeLogModal();closeEditSavedModal();closeComboModal();}
 });
+
+// ── iOS keyboard: keep log modal locked in place ───────
+// visualViewport fires when the soft keyboard appears/disappears.
+// We pin the modal-bg to the real viewport top/height so it never shrinks.
+if(window.visualViewport){
+  let _vpRaf=null;
+  function _lockLogModal(){
+    const bg=document.getElementById('logModalBg');
+    if(!bg||!bg.classList.contains('open'))return;
+    const vp=window.visualViewport;
+    bg.style.top=vp.offsetTop+'px';
+    bg.style.height=vp.height+'px';
+    bg.style.position='fixed';
+    // scroll the name input into view inside the modal if needed
+    const nameEl=document.getElementById('inputName');
+    const modal=document.getElementById('logModal');
+    if(nameEl&&modal){
+      const nameBottom=nameEl.offsetTop+nameEl.offsetHeight;
+      if(nameBottom>modal.scrollTop+modal.clientHeight){
+        modal.scrollTop=nameBottom-modal.clientHeight+12;
+      }
+    }
+  }
+  function _onVPChange(){
+    if(_vpRaf)cancelAnimationFrame(_vpRaf);
+    _vpRaf=requestAnimationFrame(_lockLogModal);
+  }
+  window.visualViewport.addEventListener('resize',_onVPChange);
+  window.visualViewport.addEventListener('scroll',_onVPChange);
+}
 
 // ── Init ──────────────────────────────────────────────
 document.getElementById('headerDate').textContent=new Date().toLocaleDateString('en-US',{timeZone:TZ,weekday:'long',month:'long',day:'numeric'}).toUpperCase();
