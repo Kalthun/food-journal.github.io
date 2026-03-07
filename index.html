@@ -145,31 +145,31 @@
   .saved-chip.normal.over-limit { border-color:var(--danger) !important; }
   .saved-chip.normal.over-limit .chip-item-name { color:var(--danger) !important; }
   .saved-chip.over-limit { border-color:var(--danger)!important;color:var(--danger); }
-  .saved-chip.normal.chip-selected { border-color:var(--history-col) !important; }
-  .saved-chip.normal.chip-selected .chip-item-name { color:var(--history-col) !important; }
-  .saved-chip.normal.chip-selected-over { border-color:var(--edit-col) !important; }
-  .saved-chip.normal.chip-selected-over .chip-item-name { color:var(--edit-col) !important; }
-  .saved-chip.combo-chip.chip-selected { border-color:var(--history-col) !important; }
-  .saved-chip.combo-chip.chip-selected .combo-chip-name { color:var(--history-col) !important; }
-  .saved-chip.combo-chip.chip-selected-over { border-color:var(--edit-col) !important; }
-  .saved-chip.combo-chip.chip-selected-over .combo-chip-name { color:var(--edit-col) !important; }
+  .saved-chip.normal.chip-selected { border-color:var(--text) !important; }
+  .saved-chip.normal.chip-selected .chip-item-name { color:var(--text) !important; }
+  .saved-chip.normal.chip-selected-over { border-color:var(--text) !important; }
+  .saved-chip.normal.chip-selected-over .chip-item-name { color:var(--text) !important; }
+  .saved-chip.combo-chip.chip-selected { border-color:var(--text) !important; }
+  .saved-chip.combo-chip.chip-selected .combo-chip-name { color:var(--text) !important; }
+  .saved-chip.combo-chip.chip-selected-over { border-color:var(--text) !important; }
+  .saved-chip.combo-chip.chip-selected-over .combo-chip-name { color:var(--text) !important; }
   @media (hover: hover) {
     .saved-chip.normal:hover { border-color:var(--streak); }
     .saved-chip.normal:hover .chip-item-name { color:var(--streak) !important; }
     .saved-chip.normal.over-limit:hover { border-color:var(--danger); }
     .saved-chip.normal.over-limit:hover .chip-item-name { color:var(--danger) !important; }
-    .saved-chip.normal.chip-selected:hover { border-color:var(--history-col) !important; }
-    .saved-chip.normal.chip-selected:hover .chip-item-name { color:var(--history-col) !important; }
-    .saved-chip.normal.chip-selected-over:hover { border-color:var(--edit-col) !important; }
-    .saved-chip.normal.chip-selected-over:hover .chip-item-name { color:var(--edit-col) !important; }
+    .saved-chip.normal.chip-selected:hover { border-color:var(--text) !important; }
+    .saved-chip.normal.chip-selected:hover .chip-item-name { color:var(--text) !important; }
+    .saved-chip.normal.chip-selected-over:hover { border-color:var(--text) !important; }
+    .saved-chip.normal.chip-selected-over:hover .chip-item-name { color:var(--text) !important; }
     .saved-chip.combo-chip:hover { border-color:var(--streak); }
     .saved-chip.combo-chip:hover .combo-chip-name { color:var(--streak); }
     .saved-chip.combo-chip.over-limit:hover { border-color:var(--danger); }
     .saved-chip.combo-chip.over-limit:hover .combo-chip-name { color:var(--danger); }
-    .saved-chip.combo-chip.chip-selected:hover { border-color:var(--history-col) !important; }
-    .saved-chip.combo-chip.chip-selected:hover .combo-chip-name { color:var(--history-col) !important; }
-    .saved-chip.combo-chip.chip-selected-over:hover { border-color:var(--edit-col) !important; }
-    .saved-chip.combo-chip.chip-selected-over:hover .combo-chip-name { color:var(--edit-col) !important; }
+    .saved-chip.combo-chip.chip-selected:hover { border-color:var(--text) !important; }
+    .saved-chip.combo-chip.chip-selected:hover .combo-chip-name { color:var(--text) !important; }
+    .saved-chip.combo-chip.chip-selected-over:hover { border-color:var(--text) !important; }
+    .saved-chip.combo-chip.chip-selected-over:hover .combo-chip-name { color:var(--text) !important; }
   }
   .saved-chip.managing { background:var(--bg);border-color:var(--surface2);cursor:default; }
   .saved-chip .chip-name { flex:1; }
@@ -690,8 +690,8 @@ function renderEntry(e, deleteHandler, showDate=true){
     '<div style="flex:1;min-width:0;">'
     +'<div class="entry-name">'+esc(e.name)+(()=>{const sz=(e.comboSize||e.comboUnit)?[e.comboSize,e.comboUnit].filter(Boolean).join(' '):'';const rsz=(e.size||e.unit)?[e.size,e.unit].filter(Boolean).join(' '):'';const display=sz||rsz;const qty=(e.servings&&e.servings!==1)?` <span style="color:var(--qty-col);font-size:0.9em;">x${e.servings}</span>`:'';return display?` <span style="color:var(--tab-act);font-size:0.9em;">(${esc(display)})</span>${qty}`:qty;})()+'</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">'
+    +'<div><span class="entry-cal">'+e.cal+' kcal</span> <span style="color:var(--muted)">|</span> <span class="entry-pro">'+e.pro+' g</span></div>'
     +'<div class="entry-time">'+timeStr+'</div>'
-    +'<div style="text-align:right;"><span class="entry-cal">'+e.cal+' kcal</span> <span style="color:var(--muted)">|</span> <span class="entry-pro">'+e.pro+' g</span></div>'
     +'</div>'
     +'</div>'
     +'<div class="entry-actions"'+(hasCombo?' onclick="event.stopPropagation()"':'')+'>'
@@ -1302,6 +1302,7 @@ function toggleManage(){
     document.getElementById('manageFab').classList.remove('active');;document.getElementById('manageFab').style.background='';document.getElementById('manageFab').style.borderColor='';document.getElementById('manageFab').style.color='';
     document.getElementById('manageFab').style.background='';document.getElementById('manageFab').style.borderColor='';document.getElementById('manageFab').style.color='';
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
+    updateDialBtnColor();
   } else {
     closeHistory();
     document.getElementById('goalsPanel').style.display='none';document.getElementById('goalsFab').classList.remove('active');;document.getElementById('goalsFab').style.background='';document.getElementById('goalsFab').style.borderColor='';document.getElementById('goalsFab').style.color='';
@@ -1311,6 +1312,7 @@ function toggleManage(){
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     scrollAllToTop();
     setQuickTab('items');
+    updateDialBtnColor();
   }
 }
 
@@ -1601,11 +1603,24 @@ document.querySelectorAll('.tab').forEach(t=>{
     document.getElementById('goalsFab').classList.remove('active');;document.getElementById('goalsFab').style.background='';document.getElementById('goalsFab').style.borderColor='';document.getElementById('goalsFab').style.color='';
     document.getElementById('managePanel').style.display='none';
     document.getElementById('manageFab').classList.remove('active');;document.getElementById('manageFab').style.background='';document.getElementById('manageFab').style.borderColor='';document.getElementById('manageFab').style.color='';
+    const _db=document.getElementById('speedDialBtn');if(_db){_db.style.background='';_db.style.color='';}
     render();
+    updateDialBtnColor();
   });
 });
 
 // ── Speed Dial ────────────────────────────────────────
+function updateDialBtnColor(){
+  const btn=document.getElementById('speedDialBtn');
+  if(!btn)return;
+  const goalsOpen=document.getElementById('goalsPanel').style.display!=='none';
+  const historyOpen=document.getElementById('historyPanel').style.display!=='none';
+  const menuOpen=document.getElementById('managePanel').style.display!=='none';
+  if(goalsOpen){btn.style.background='var(--streak)';btn.style.color='var(--btn-fg)';}
+  else if(historyOpen){btn.style.background='var(--history-col)';btn.style.color='var(--btn-fg)';}
+  else if(menuOpen){btn.style.background='var(--tab-act)';btn.style.color='var(--btn-fg)';}
+  else{btn.style.background='';btn.style.color='var(--text)';}
+}
 function toggleSpeedDial(){
   const panel=document.getElementById('speedDialPanel');
   const btn=document.getElementById('speedDialBtn');
@@ -1645,6 +1660,7 @@ function toggleGoals(){
     fab.classList.remove('active');
     fab.style.background='';fab.style.borderColor='';fab.style.color='';
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
+    updateDialBtnColor();
   } else {
     closeHistory();
     document.getElementById('managePanel').style.display='none';document.getElementById('manageFab').classList.remove('active');;document.getElementById('manageFab').style.background='';document.getElementById('manageFab').style.borderColor='';document.getElementById('manageFab').style.color='';
@@ -1654,6 +1670,7 @@ function toggleGoals(){
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     scrollAllToTop();
     initGoalsUI();
+    updateDialBtnColor();
   }
 }
 
@@ -1669,6 +1686,7 @@ function closeHistory(){
   document.getElementById('historyPanelHeader').classList.remove('history-active');
   document.getElementById('historyNav').style.display='none';
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentTab));
+  updateDialBtnColor();
 }
 
 function openHistory(){
@@ -1685,6 +1703,7 @@ function openHistory(){
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   historyDate=todayStr();
   renderHistory();
+  updateDialBtnColor();
 }
 
 // ── Keyboard ──────────────────────────────────────────
